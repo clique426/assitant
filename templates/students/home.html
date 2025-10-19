@@ -1,0 +1,132 @@
+{% extends 'students/base.html' %}
+
+{% block title %}保研加分小助手 - 首页{% endblock %}
+
+{% block content %}
+<style>
+    .hero-header {
+        background-color: #17a2b8;
+        color: white;
+        padding: 3rem 0;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    .dashboard-card .card-header {
+        background-color: #28a745;
+    }
+    .stat-card .card-body {
+        text-align: center;
+    }
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #007bff;
+    }
+    .stat-label {
+        font-size: 1rem;
+        color: #6c757d;
+        margin-top: 0.5rem;
+    }
+    .btn-feature {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+</style>
+
+<div class="hero-header">
+    <div class="container">
+        <div class="text-center">
+            <h1 class="mb-2">保研加分小助手</h1>
+            <p class="lead">高效、便捷的保研加分小助手</p>
+        </div>
+    </div>
+</div>
+
+<div class="container py-0">
+        {% if user.is_authenticated %}
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card dashboard-card">
+                    <div class="card-header">
+                        <h5 class="mb-0">系统概览</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="stat-card card">
+                                    <div class="card-body">
+                                        <div class="stat-number">{{ total_students|default:'0' }}</div>
+                                        <div class="stat-label">总学生数</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card card">
+                                    <div class="card-body">
+                                        <div class="stat-number">{{ total_submissions|default:'0' }}</div>
+                                        <div class="stat-label">总提交数</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card card">
+                                    <div class="card-body">
+                                        <div class="stat-number">{{ pending_submissions|default:'0' }}</div>
+                                        <div class="stat-label">待审核数</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card card">
+                                    <div class="card-body">
+                                        <div class="stat-number">{{ total_score_items|default:'0' }}</div>
+                                        <div class="stat-label">加分项目数</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">功能模块</h5>
+                    </div>
+                    <div class="card-body">
+                        <a href="{% url 'upload-proof' %}" class="btn btn-primary btn-feature">上传证明材料</a>
+                        <a href="{% url 'submission-history' %}" class="btn btn-success btn-feature">查看提交记录</a>
+                        {% if user.is_staff %}
+                        <a href="{% url 'scoreitem-list' %}" class="btn btn-info btn-feature">加分项目管理</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">系统信息</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            <li class="list-group-item">系统版本: v1.0.0</li>
+                            <li class="list-group-item">开发团队: rainyroad队</li>
+                            <li class="list-group-item">技术支持: django</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{% endblock %}
