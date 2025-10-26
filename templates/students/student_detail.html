@@ -1,0 +1,152 @@
+{% extends 'students/base.html' %}
+{% load students_extras %}
+
+{% block title %}学生详情 - 成绩管理系统{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+        <!-- 显示成功消息的增强样式 -->
+        {% for message in messages %}
+        <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% elif message.tags == 'warning' %}alert-warning{% else %}alert-info{% endif %} alert-dismissible fade show" role="alert" id="message-alert">
+            {% if message.tags == 'success' %}<i class="fa fa-check-circle mr-2"></i>{% elif message.tags == 'error' %}<i class="fa fa-exclamation-circle mr-2"></i>{% endif %}
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h2>学生详情</h2>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <strong>姓名:</strong> {{ student.full_name }}
+                            </div>
+                            <div class="mb-3">
+                                <strong>学号:</strong> {{ student.student_id }}
+                            </div>
+                            <div class="mb-3">
+                                <strong>专业:</strong> {{ student.major }}
+                            </div>
+                            <div class="mb-3">
+                                <strong>年级:</strong> {{ student.grade }}
+                            </div>
+                            <div class="mb-3">
+                                <strong>班级:</strong> {{ student.class_name }}
+                            </div>
+                            <div class="mb-3">
+                                <strong>邮箱:</strong> {{ student.email }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <strong>电话:</strong> {{ student.phone|default:"未设置" }}
+                            </div>
+
+                            <div class="mb-3">
+                                <strong>总加分:</strong> <span data-field="total_score">{{ student.total_score }}</span>
+                            </div>
+                            <div class="mb-3">
+                                <strong>提交记录数:</strong> <span data-field="submission_count">{{ submission_count_direct }}</span>
+                            </div>
+                            <div class="mb-3">
+                                <strong>通过记录数:</strong> <span data-field="approved_count">{{ approved_count_direct }}</span>
+                            </div>
+                            <div class="mb-3">
+                                <strong>用户账号:</strong> {{ student.user.username }}
+                            </div>
+                            <div class="mb-3">
+                                <strong>账号状态:</strong> 
+                                {% if student.user.is_active %}<span class="text-success">正常</span>{% else %}<span class="text-danger">禁用</span>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+
+                </div>
+            </div>
+            
+            <hr>
+            
+            <div class="mt-4">
+                <h5>操作选项</h5>
+                <div class="btn-group">
+                    {% if is_teacher or student.user == user %}
+                        <button id="edit-info-btn" class="btn btn-primary">编辑信息</button>
+                    {% endif %}
+                    <a href="{% url 'students:home' %}" class="btn btn-secondary">返回首页</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 使用DOMContentLoaded确保DOM完全加载后再绑定事件
+    document.addEventListener('DOMContentLoaded', function() {
+        try {
+            const editBtn = document.getElementById('edit-info-btn');
+            
+            if (editBtn) {
+                editBtn.addEventListener('click', function(e) {
+                    // 阻止默认行为和事件冒泡
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // 添加调试日志
+                    console.log('编辑按钮被点击');
+                    
+                    // 检查当前用户是否为教师或管理员
+                    const isTeacher = {% if is_teacher %}true{% else %}false{% endif %};
+                    
+                    if (isTeacher) {
+                        // 对于教师/管理员，跳转到专用的编辑页面
+                        const studentId = {{ student.id }};
+                        console.log(`教师/管理员正在编辑学生ID: ${studentId}的信息`);
+                        window.location.href = `{% url 'students:edit-student-info' student.id %}`;
+                    } else {
+                        // 对于普通学生，跳转到个人信息编辑页面
+                        console.log('跳转到个人信息编辑页面');
+                        window.location.href = '{% url 'students:personal-info' %}';
+                    }
+                });
+            }
+            
+            // 自动隐藏消息提示
+            const messageAlert = document.getElementById('message-alert');
+            if (messageAlert) {
+                // 3秒后自动隐藏成功消息
+                if (messageAlert.classList.contains('alert-success')) {
+                    setTimeout(function() {
+                        // 添加淡出效果
+                        messageAlert.classList.add('fade');
+                        setTimeout(function() {
+                            messageAlert.remove();
+                        }, 500); // 等待淡出动画完成
+                    }, 3000);
+                }
+            }
+            
+            // 为页面上所有的信息卡片添加轻微的动画效果
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(10px)';
+                    card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 50);
+                }, index * 100);
+            });
+        } catch (error) {
+            console.error('编辑按钮事件处理错误:', error);
+        }
+    });
+</script>
+{% endblock %}

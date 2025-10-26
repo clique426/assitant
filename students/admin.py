@@ -39,6 +39,16 @@ class ScoreItemAdmin(admin.ModelAdmin):
 # 提交记录管理（增强版）
 @admin.register(Submission)
 class SubmissionAdmin(admin.ModelAdmin):
+    # 定义权限过滤器，确保管理员只看到需要审核的记录
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        # 对于普通用户（学生），不显示提交记录
+        if request.user.is_superuser or request.user.is_staff:
+            # 管理员可以看到所有记录
+            return qs
+        # 普通用户看不到任何记录（安全起见）
+        return qs.none()
+    
     list_display = (
         'id', 
         'student', 

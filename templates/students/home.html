@@ -105,10 +105,15 @@
                         <h5 class="mb-0">功能模块</h5>
                     </div>
                     <div class="card-body">
+                        {% if not is_teacher %}
                         <a href="{% url 'upload-proof' %}" class="btn btn-primary btn-feature">上传证明材料</a>
                         <a href="{% url 'submission-history' %}" class="btn btn-success btn-feature">查看提交记录</a>
-                        {% if user.is_staff %}
-                        <a href="{% url 'scoreitem-list' %}" class="btn btn-info btn-feature">加分项目管理</a>
+                        {% endif %}
+                        {% if user.is_staff or is_teacher %}
+                        <a href="{% url 'students:studentprofile-list' %}" class="btn btn-secondary btn-feature">学生信息管理</a>
+                        <a href="{% url 'students:submission-list' %}" class="btn btn-warning btn-feature">提交记录管理</a>
+                        <a href="{% url 'students:scoreitem-list' %}" class="btn btn-info btn-feature">加分项目管理</a>
+                        <a href="/admin/" class="btn btn-danger btn-feature">后台管理</a>
                         {% endif %}
                     </div>
                 </div>

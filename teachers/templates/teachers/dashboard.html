@@ -5,8 +5,13 @@
 {% block content %}
 <div class="row mb-4">
     <div class="col-md-12">
+        {% if teacher %}
         <h2>欢迎您，{{ teacher.full_name }}</h2>
         <p class="text-muted">工号：{{ teacher.teacher_id }} | 部门：{{ teacher.department }}</p>
+        {% else %}
+        <h2>欢迎您，超级管理员</h2>
+        <p class="text-muted">账号：{{ user.username }} | 系统管理员</p>
+        {% endif %}
     </div>
 </div>
 

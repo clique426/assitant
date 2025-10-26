@@ -6,8 +6,8 @@ from students.models import Submission, ScoreItem
 
 @login_required
 def teacher_dashboard(request):
-    # 确保只有老师可以访问
-    if not hasattr(request.user, 'teacher_profile'):
+    # 确保只有老师或超级管理员可以访问
+    if not hasattr(request.user, 'teacher_profile') and not request.user.is_superuser:
         return redirect('home')
     
     # 获取待审核的提交记录
@@ -24,19 +24,22 @@ def teacher_dashboard(request):
         'rejected_count': Submission.objects.filter(status='rejected').count(),
     }
     
+    # 构建上下文，确保超级管理员账号被视为老师类型
     context = {
-        'teacher': request.user.teacher_profile,
+        'teacher': request.user.teacher_profile if hasattr(request.user, 'teacher_profile') else None,
         'pending_submissions': pending_submissions,
         'recent_reviews': recent_reviews,
-        'stats': stats
+        'stats': stats,
+        'is_teacher': True,  # 标记为老师类型
+        'user': request.user
     }
     
     return render(request, 'teachers/dashboard.html', context)
 
 @login_required
 def review_submission(request, submission_id):
-    # 确保只有老师可以访问
-    if not hasattr(request.user, 'teacher_profile'):
+    # 确保只有老师或超级管理员可以访问
+    if not hasattr(request.user, 'teacher_profile') and not request.user.is_superuser:
         return redirect('home')
     
     # 这里可以添加审核提交记录的逻辑
@@ -45,14 +48,16 @@ def review_submission(request, submission_id):
 
 @login_required
 def teacher_profile(request):
-    # 确保只有老师可以访问
-    if not hasattr(request.user, 'teacher_profile'):
+    # 确保只有老师或超级管理员可以访问
+    if not hasattr(request.user, 'teacher_profile') and not request.user.is_superuser:
         return redirect('home')
     
-    teacher = request.user.teacher_profile
+    teacher = request.user.teacher_profile if hasattr(request.user, 'teacher_profile') else None
     
     context = {
-        'teacher': teacher
+        'teacher': teacher,
+        'is_teacher': True,
+        'user': request.user
     }
     
     return render(request, 'teachers/profile.html', context)

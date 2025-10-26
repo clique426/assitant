@@ -145,10 +145,19 @@
                                                 <a href="{{ submission.detail_url }}" class="btn btn-sm btn-info btn-action" title="查看详情">查看</a>
                                                 {% if submission.status == 'pending' %}
                                                     {% if user.is_staff %}
-                                                        <a href="{{ submission.approve_url }}" class="btn btn-sm btn-success btn-action" title="通过" onclick="return confirm('确定要通过这条提交吗？')">通过</a>
-                                                        <a href="{{ submission.reject_url }}" class="btn btn-sm btn-danger btn-action" title="驳回" onclick="return confirm('确定要驳回这条提交吗？')">驳回</a>
+                                                        <form action="{{ submission.approve_url }}" method="post" style="display: inline;">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-sm btn-success btn-action" title="通过" onclick="return confirm('确定要通过这条提交吗？')">通过</button>
+                                                        </form>
+                                                        <form action="{{ submission.reject_url }}" method="post" style="display: inline;">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-sm btn-danger btn-action" title="驳回" onclick="return confirm('确定要驳回这条提交吗？')">驳回</button>
+                                                        </form>
                                                     {% else %}
-                                                        <a href="{{ submission.revoke_url }}" class="btn btn-sm btn-warning btn-action" title="撤销" onclick="return confirm('确定要撤销这条提交吗？')">撤销</a>
+                                                        <form action="{{ submission.revoke_url }}" method="post" style="display: inline;">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-sm btn-warning btn-action" title="撤销" onclick="return confirm('确定要撤销这条提交吗？')">撤销</button>
+                                                        </form>
                                                     {% endif %}
                                                 {% endif %}
                                             </td>

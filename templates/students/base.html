@@ -4,17 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}保研加分小助手{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    {% load static %}
+    <!-- 使用cdnjs CDN链接 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/css/bootstrap.min.css" integrity="sha512-rt/SrQ4UNIaGfDyEXZtNcyWvQeOq0QLygHluFQcSjaGB04IxWhal71tKuzP6K8eYXYB6vJV4pHkXcmFGGQ1/0w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background-color: #f8f9fa;
         }
         .header {
-            background-color: #17a2b8;
+            background: linear-gradient(135deg, #17a2b8, #138496);
             color: white;
             padding: 1rem 0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
         .navbar-brand {
             font-size: 1.5rem;
@@ -32,14 +35,416 @@
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
         }
         .card-header {
-            background-color: #007bff;
+            background-color: #17a2b8;
             color: white;
+            border-bottom: none;
+        }
+        
+        /* 通用div容器样式 */
+        .content-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .content-container:hover {
+            box-shadow: 0 4px 12px rgba(23, 162, 184, 0.15);
+        }
+        
+        /* 分隔区域样式 */
+        .section-divider {
+            background: linear-gradient(90deg, transparent, rgba(23, 162, 184, 0.2), transparent);
+            height: 2px;
+            margin: 2rem 0;
+            border: none;
+        }
+        
+        /* 信息卡片样式 */
+        .info-card {
+            background-color: #f8fafc;
+            border-left: 4px solid #17a2b8;
+            border-radius: 0 8px 8px 0;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        /* 警告卡片样式 */
+        .warning-card {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 0 8px 8px 0;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        /* 成功卡片样式 */
+        .success-card {
+            background-color: #d4edda;
+            border-left: 4px solid #28a745;
+            border-radius: 0 8px 8px 0;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        /* 状态卡片样式 */
+        .status-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 1.25rem;
+            transition: all 0.3s ease;
+        }
+        
+        .status-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(23, 162, 184, 0.15);
+        }
+        
+        /* 排版样式优化 */
+        h1, h2, h3, h4, h5, h6 {
+            color: #212529;
+            font-weight: 600;
+            line-height: 1.3;
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+        
+        h1 {
+            font-size: 2.25rem;
+        }
+        
+        h2 {
+            font-size: 1.875rem;
+        }
+        
+        h3 {
+            font-size: 1.5rem;
+        }
+        
+        h4 {
+            font-size: 1.25rem;
+        }
+        
+        h5 {
+            font-size: 1.125rem;
+        }
+        
+        h6 {
+            font-size: 1rem;
+        }
+        
+        p {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            color: #495057;
+        }
+        
+        /* 间距工具类 */
+        .space-y-1 > * + * {
+            margin-top: 0.25rem;
+        }
+        
+        .space-y-2 > * + * {
+            margin-top: 0.5rem;
+        }
+        
+        .space-y-4 > * + * {
+            margin-top: 1rem;
+        }
+        
+        .space-y-6 > * + * {
+            margin-top: 1.5rem;
+        }
+        
+        .space-y-8 > * + * {
+            margin-top: 2rem;
+        }
+        
+        /* 内容区域间距优化 */
+        .content-section {
+            padding: 2rem;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+        }
+        
+        /* 响应式间距调整 */
+        @media (max-width: 768px) {
+            .content-section {
+                padding: 1.5rem;
+            }
+            
+            h1 {
+                font-size: 1.875rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+        }
+        
+        /* 网格布局优化 */
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        /* 居中容器 */
+        .center-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        
+        /* 行内内容容器 */
+        .inline-content {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+        
+        /* 交互效果增强 */
+        
+        /* 悬停卡片效果 */
+        .hover-card {
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        
+        .hover-card:hover {
+            transform: translateY(-2px);
+            border-color: #17a2b8;
+            box-shadow: 0 4px 15px rgba(23, 162, 184, 0.15);
+        }
+        
+        /* 点击反馈效果 */
+        .clickable {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .clickable:active {
+            transform: scale(0.98);
+        }
+        
+        /* 渐入动画 */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* 脉冲动画效果 */
+        .pulse-effect {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pulse-effect::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%, -50%);
+            transform-origin: 50% 50%;
+        }
+        
+        .pulse-effect:focus::after {
+            animation: ripple 0.5s ease-out;
+        }
+        
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 0.5;
+            }
+            20% {
+                transform: scale(25, 25);
+                opacity: 0.3;
+            }
+            100% {
+                opacity: 0;
+                transform: scale(40, 40);
+            }
+        }
+        
+        /* 边框高亮效果 */
+        .border-highlight {
+            border: 1px solid #dee2e6;
+            transition: border-color 0.3s ease;
+        }
+        
+        .border-highlight:hover {
+            border-color: #17a2b8;
+        }
+        
+        /* 背景高亮效果 */
+        .bg-highlight {
+            transition: background-color 0.3s ease;
+        }
+        
+        .bg-highlight:hover {
+            background-color: #f8fafc;
+        }
+        
+        /* 平滑过渡工具类 */
+        .transition-all {
+            transition: all 0.3s ease;
+        }
+        
+        .transition-transform {
+            transition: transform 0.3s ease;
+        }
+        
+        .transition-color {
+            transition: color 0.3s ease;
+        }
+        
+        .transition-bg {
+            transition: background-color 0.3s ease;
+        }
+        
+        /* 自定义Teal颜色方案 */
+        .text-teal-600 {
+            color: #0d6e77 !important;
+        }
+        
+        /* 按钮基础样式 */
+        .btn-teal {
+            background-color: #17a2b8;
+            color: white;
+            border: none;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .btn-teal:hover {
+            background-color: #138496;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .btn-teal:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 6px rgba(23, 162, 184, 0.2) !important;
+        }
+        
+        .btn-teal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+            z-index: -1;
+        }
+        
+        .btn-teal:hover::before {
+            left: 100%;
+        }
+        
+        .btn-outline-teal {
+            border: 2px solid #17a2b8;
+            color: #0d6e77;
+            background-color: transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-teal:hover {
+            background-color: #e6f7f9;
+            color: #0d6e77;
+            border-color: #138496;
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline-teal:active {
+            transform: translateY(0);
+        }
+        
+        /* 背景色 */
+        .bg-teal-50 {
+            background-color: #f1fafb;
+        }
+        
+        .from-blue-50 {
+            background-color: #f8fafc;
+        }
+        
+        .to-teal-50 {
+            background-color: #f1fafb;
+        }
+        
+        /* 卡片动画效果 */
+        .login-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .login-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        /* 平滑滚动 */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* 链接交互 */
+        a:hover {
+            text-decoration: none !important;
+        }
+        
+        /* 图标动画 */
+        .animated-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .btn:hover .animated-icon {
+            transform: scale(1.1);
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .login-card {
+                padding: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
+{% if user.is_authenticated %}
+    <!-- 已登录用户的导航栏 -->
     <header class="header">
         <div class="container">
             <nav class="navbar navbar-expand-lg navbar-dark">
@@ -50,52 +455,44 @@
                     <!-- 导航菜单 -->
                     <div class="collapse navbar-collapse justify-content-end">
                         <ul class="navbar-nav">
-                            {% if not user.is_authenticated %}
+                            <!-- 已登录用户菜单 - 保留首页链接 -->
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'home' %}">首页</a>
                             </li>
-                            {% endif %}
-                            <!-- 已登录用户的首页链接在下面根据用户类型显示 -->
-                            
-                            {% if user.is_authenticated %}
-                            <!-- 已登录用户菜单 -->
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'home' %}">首页</a>
-                            </li>
-                            {% if not user.is_staff %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'personal-info' %}">个人信息</a>
-                            </li>
-                            {% endif %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'submission-history' %}">提交记录</a>
-                            </li>
-                            {% if user.is_staff %}
+                            {% if user.teacherprofile or user.is_superuser %}<!-- 教师和管理员账号 -->
+                            <!-- 管理中心按钮 - 教师和管理员账号可见 -->
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     管理中心
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
-                                    <li><a class="dropdown-item" href="{% url 'studentprofile-list' %}">学生信息管理</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'submission-list' %}">提交记录管理</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'scoreitem-list' %}">加分项目管理</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'students:studentprofile-list' %}">学生信息管理</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'students:submission-list' %}">提交记录管理</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'students:scoreitem-list' %}">加分项目管理</a></li>
                                     <li class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="{% url 'admin:index' %}" target="_blank">Django后台管理</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'admin:index' %}" target="_blank">后台管理</a></li>
                                 </ul>
                             </li>
-                            {% endif %}
+                            <!-- 老师与管理员账号显示欢迎字段 -->
                             <li class="nav-item">
                                 <span class="nav-link">欢迎，{{ user.username }}</span>
                             </li>
+                            {% else %}<!-- 学生账号 -->
+                            <!-- 学生账号导航链接 -->
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'personal-info' %}">个人信息</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'submission-history' %}">提交记录</a>
+                            </li>
+                            <!-- 学生账号显示欢迎字段 -->
+                            <li class="nav-item">
+                                <span class="nav-link">欢迎，{{ user.username }}</span>
+                            </li>
+                            {% endif %}
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'logout' %}">退出登录</a>
                             </li>
-                            {% else %}
-                            <!-- 未登录用户菜单 -->
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'login' %}">登录 / 注册</a>
-                            </li>
-                            {% endif %}
                         </ul>
                     </div>
                 </div>
@@ -112,7 +509,71 @@
             <p>© 2025 保研加分小助手 版权所有</p>
         </div>
     </footer>
+{% else %}
+    <!-- 未登录用户的界面 - 优化后的登录注册页面 -->
+    <div class="min-vh-100 d-flex flex-column bg-gradient-to-br from-blue-50 to-teal-50">
+        <div class="container flex-grow-1 d-flex flex-column justify-content-center align-items-center py-8 px-4">
+            <!-- 品牌标识区域 -->
+            <div class="text-center mb-10">
+                <div class="inline-block p-3 bg-white rounded-full shadow-md mb-4">
+                    <i class="fa fa-graduation-cap text-4xl text-teal-500"></i>
+                </div>
+                <h1 class="text-4xl md:text-5xl font-bold text-teal-600 mb-3 leading-tight">保研加分小助手</h1>
+                <p class="text-gray-600 text-lg md:text-xl max-w-lg mx-auto">专业的大学生综合素质评价与加分管理系统</p>
+            </div>
+            
+            <!-- 登录注册卡片 -->
+            <div class="w-100 max-w-sm bg-white rounded-2xl shadow-xl p-6 md:p-8 login-card">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">欢迎回来</h2>
+                    <p class="text-gray-500">请登录或注册以继续使用</p>
+                </div>
+                <!-- 合并的登录/注册按钮容器 - 居中显示 -->
+                <div class="pt-4 pb-2 text-center">
+                    <a href="{% url 'login' %}" class="btn btn-teal py-4 px-8 text-xl font-semibold rounded-xl shadow-lg bg-gradient-to-r from-teal-500 to-teal-600 text-white hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                        <i class="fa fa-user-circle mr-2 animated-icon"></i> 登录 / 注册
+                    </a>
+                </div>
+                
+                <!-- 按钮居中显示，无需额外提示文本 -->
+            </div>
+        </div>
+        <footer class="py-4 bg-light">
+            <div class="container text-center text-muted">
+                <p>© 2025 保研加分小助手 版权所有</p>
+            </div>
+        </footer>
+    </div>
+{% endif %}
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- 使用cdnjs CDN链接 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/js/bootstrap.bundle.min.js" integrity="sha512-igl8WEUuas9k5dtnhL3SrLRnr1rR6h48pKlKM18o4zqoXli+qnWt14wgXr4qfdj0NQcacV0vps89DvXmr6x6NQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
+    <!-- 自定义JavaScript处理下拉菜单 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var dropdownToggle = document.getElementById('adminDropdown');
+            if (dropdownToggle) {
+                dropdownToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var dropdownMenu = this.nextElementSibling;
+                    if (dropdownMenu) {
+                        dropdownMenu.classList.toggle('show');
+                    }
+                });
+                
+                // 点击页面其他地方关闭下拉菜单
+                document.addEventListener('click', function(e) {
+                    var dropdownMenu = dropdownToggle.nextElementSibling;
+                    if (dropdownMenu && !dropdownToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                        dropdownMenu.classList.remove('show');
+                    }
+                });
+            }
+        });
+    </script>
+    
+    <!-- 数据持久化功能 -->
+    <script src="{% static 'js/data_persistence.js' %}"></script>
 </body>
 </html>

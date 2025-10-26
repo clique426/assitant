@@ -1,0 +1,80 @@
+{% extends 'students/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">{% if edit_mode %}编辑加分项目{% else %}加分项目详情{% endif %}</h2>
+    
+    <div class="card">
+        <div class="card-body">
+            {% if edit_mode and is_teacher %}
+            <!-- 编辑模式：显示表单 -->
+            <form method="post" action="{% url 'students:scoreitem-detail' score_item.id %}">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="name">名称 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ score_item.name }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="category">类别 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="category" name="category" value="{{ score_item.category }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="level">级别 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="level" name="level" value="{{ score_item.level }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="score">分值 <span class="text-danger">*</span></label>
+                            <input type="number" step="0.1" class="form-control" id="score" name="score" value="{{ score_item.score }}" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="description">描述</label>
+                            <textarea class="form-control" id="description" name="description" rows="4">{{ score_item.description|default:'' }}</textarea>
+                        </div>
+                        <div class="mt-4">
+                            <p><strong>创建时间:</strong> {{ score_item.created_at|date:'Y-m-d H:i:s' }}</p>
+                            <p><strong>更新时间:</strong> {{ score_item.updated_at|date:'Y-m-d H:i:s' }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-success">保存修改</button>
+                    <a href="{% url 'students:scoreitem-detail' score_item.id %}" class="btn btn-secondary">取消</a>
+                    <a href="{% url 'students:scoreitem-list' %}" class="btn btn-secondary">返回列表</a>
+                </div>
+            </form>
+            {% else %}
+            <!-- 查看模式：显示详细信息 -->
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>名称:</strong> {{ score_item.name }}</p>
+                    <p><strong>类别:</strong> {{ score_item.category }}</p>
+                    <p><strong>级别:</strong> {{ score_item.level }}</p>
+                    <p><strong>分值:</strong> {{ score_item.score }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>描述:</strong> {{ score_item.description|default:'无' }}</p>
+                    <p><strong>创建时间:</strong> {{ score_item.created_at|date:'Y-m-d H:i:s' }}</p>
+                    <p><strong>更新时间:</strong> {{ score_item.updated_at|date:'Y-m-d H:i:s' }}</p>
+                </div>
+            </div>
+            
+            {% if is_teacher %}
+            <div class="mt-4">
+                <a href="{% url 'students:scoreitem-detail' score_item.id %}?edit=true" class="btn btn-primary">编辑</a>
+                <a href="{% url 'students:scoreitem-list' %}" class="btn btn-secondary">返回列表</a>
+            </div>
+            {% else %}
+            <div class="mt-4">
+                <a href="{% url 'students:scoreitem-list' %}" class="btn btn-secondary">返回列表</a>
+            </div>
+            {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -19,9 +19,41 @@ class TeacherProfile(models.Model):
 # 信号处理函数：创建用户后自动添加到老师组
 @receiver(post_save, sender=User)
 def add_user_to_teacher_group(sender, instance, created, **kwargs):
-    if created and hasattr(instance, 'teacher_profile') and instance.teacher_profile is not None:
-        # 添加到老师组并设为staff
-        teacher_group, _ = Group.objects.get_or_create(name='teachers')
-        instance.groups.add(teacher_group)
-        instance.is_staff = True
-        instance.save()
+    # 防止无限递归：检查是否已经在处理中
+    if hasattr(instance, '_adding_to_group'):
+        return
+    
+    try:
+        # 标记为正在处理中
+        instance._adding_to_group = True
+        
+        # 超级管理员账号处理
+        if instance.is_superuser:
+            # 添加到老师组并设为staff
+            teacher_group, _ = Group.objects.get_or_create(name='teachers')
+            # 只在需要时添加到组
+            if not instance.groups.filter(name='teachers').exists():
+                instance.groups.add(teacher_group)
+            # 只在需要时设置is_staff
+            if not instance.is_staff:
+                instance.is_staff = True
+                # 注意：这里不再调用instance.save()，避免触发递归
+        # 对于普通用户
+        elif created:
+            try:
+                # 通过TeacherProfile查询而不是直接访问属性
+                if TeacherProfile.objects.filter(user=instance).exists():
+                    # 添加到老师组并设为staff
+                    teacher_group, _ = Group.objects.get_or_create(name='teachers')
+                    if not instance.groups.filter(name='teachers').exists():
+                        instance.groups.add(teacher_group)
+                    if not instance.is_staff:
+                        instance.is_staff = True
+                        # 注意：这里不再调用instance.save()，避免触发递归
+            except Exception:
+                # 如果出现问题，静默失败
+                pass
+    finally:
+        # 确保移除标记
+        if hasattr(instance, '_adding_to_group'):
+            del instance._adding_to_group

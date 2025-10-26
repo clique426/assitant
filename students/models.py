@@ -65,10 +65,20 @@ class ScoreItem(models.Model):
 # 信号处理函数：创建用户后自动添加到学生组
 @receiver(post_save, sender=User)
 def add_user_to_student_group(sender, instance, created, **kwargs):
-    if created and hasattr(instance, 'profile') and instance.profile is not None:
-        # 添加到学生组
-        student_group, _ = Group.objects.get_or_create(name='students')
-        instance.groups.add(student_group)
+    # 确保超级管理员账号不会被添加到学生组
+    # 修改：只使用hasattr检查，不直接访问profile属性避免递归
+    if created and hasattr(instance, 'profile') and not instance.is_superuser:
+        # 使用try-except避免可能的异常
+        try:
+            # 延迟访问profile属性，避免信号处理时的递归问题
+            # 或者更好的方法是直接通过StudentProfile查询
+            if StudentProfile.objects.filter(user=instance).exists():
+                # 添加到学生组
+                student_group, _ = Group.objects.get_or_create(name='students')
+                instance.groups.add(student_group)
+        except Exception:
+            # 如果出现问题，静默失败，避免影响用户创建
+            pass
 
 # 提交记录模型（增强版）
 class Submission(models.Model):
@@ -76,6 +86,7 @@ class Submission(models.Model):
         ('pending', '待审核'),
         ('approved', '审核通过'),
         ('rejected', '审核拒绝'),
+        ('revoked', '已撤回'),
     ]
     student = models.ForeignKey(StudentProfile, verbose_name="学生", on_delete=models.CASCADE, related_name='submissions')
     score_item = models.ForeignKey(ScoreItem, verbose_name="加分项目", on_delete=models.CASCADE)
@@ -94,3 +105,23 @@ class Submission(models.Model):
         verbose_name = '提交记录'
         verbose_name_plural = '提交记录'
         ordering = ['-submitted_at']  # 默认按提交时间降序排列
+
+
+class StudentInfoChangeLog(models.Model):
+    """
+    学生信息变更日志模型，记录学生信息的编辑历史
+    """
+    student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE, related_name='info_change_logs')
+    editor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='student_info_edits')
+    field_name = models.CharField(max_length=50, verbose_name='修改字段')
+    old_value = models.TextField(blank=True, null=True, verbose_name='修改前值')
+    new_value = models.TextField(blank=True, null=True, verbose_name='修改后值')
+    change_time = models.DateTimeField(auto_now_add=True, verbose_name='修改时间')
+    
+    def __str__(self):
+        return f'{self.editor.username} 修改 {self.student.user.username} 的 {self.field_name} 字段'
+    
+    class Meta:
+        verbose_name = '学生信息变更日志'
+        verbose_name_plural = '学生信息变更日志'
+        ordering = ['-change_time']

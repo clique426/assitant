@@ -113,29 +113,30 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for student in students %}
-                                        <tr>
-                                            <td>{{ student.student_id }}</td>
-                                            <td>{{ student.full_name }}</td>
-                                            <td>{{ student.major }}</td>
-                                            <td>{{ student.class_name }}</td>
-                                            <td>
-                                                <span class="badge bg-primary">{{ student.total_score|default:0 }}</span>
-                                            </td>
-                                            <td>{{ student.submission_count|default:0 }}</td>
-                                            <td>{{ student.approved_count|default:0 }}</td>
-                                            <td>
-                                                <a href="{{ student.detail_url }}" class="btn btn-sm btn-info btn-action" title="查看详情">查看</a>
-                                                {% if user.is_staff or user == student.user %}
-                                                    <a href="{{ student.edit_url }}" class="btn btn-sm btn-warning btn-action" title="编辑">编辑</a>
-                                                {% endif %}
-                                            </td>
-                                        </tr>
-                                    {% empty %}
+
+                                    <!-- 遍历学生数据 -->
+                                    {% if students %}
+                                        {% for student in students %}
+                                            <tr>
+                                                <td>{{ student.student_id|default:"未知" }}</td>
+                                                <td>{{ student.full_name|default:"未知" }}</td>
+                                                <td>{{ student.major|default:"未知" }}</td>
+                                                <td>{{ student.class_name|default:"未知" }}</td>
+                                                <td>
+                                                    <span class="badge bg-primary">{{ student.total_score|default:0 }}</span>
+                                                </td>
+                                                <td>{{ student.submission_count|default:0 }}</td>
+                                                <td>{{ student.approved_count|default:0 }}</td>
+                                                <td>
+                                            <a href="{{ student.detail_url|default:'#' }}" class="btn btn-sm btn-primary btn-action" title="查看/编辑详情">查看/编辑</a>
+                                        </td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% else %}
                                         <tr>
                                             <td colspan="8" class="text-center text-muted">暂无学生数据</td>
                                         </tr>
-                                    {% endfor %}
+                                    {% endif %}
                                 </tbody>
                             </table>
                         </div>

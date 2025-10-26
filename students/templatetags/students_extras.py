@@ -3,6 +3,14 @@ from django.utils.safestring import mark_safe
 
 register = template.Library()
 
+@register.filter(name='approved_count')
+def approved_count(submissions):
+    """计算通过的提交记录数"""
+    try:
+        return submissions.filter(status='approved').count()
+    except:
+        return 0
+
 @register.filter(name='get_status_color')
 def get_status_color(status):
     """

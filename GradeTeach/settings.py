@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-y_a=54f63kh6a5ct4toz$t1+9b1g0zz9%%^=y0%7qjtb-3r9b7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'testserver']
 
 # 邮件设置（用于开发环境，将邮件输出到控制台）
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'students.apps.StudentsConfig',
     'teachers.apps.TeachersConfig',
+    'users',  # 添加用户应用
     'rest_framework',
 ]
 

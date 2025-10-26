@@ -17,7 +17,7 @@ class StudentProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentProfile
         fields = ['id', 'user', 'full_name', 'student_id', 'major', 'grade',
-                 'class_name', 'email', 'phone', 'admission_date', 'total_score', 
+                 'class_name', 'email', 'phone', 'total_score', 
                  'rank', 'submission_count', 'approved_count', 'last_updated']
         read_only_fields = ['total_score', 'rank', 'submission_count', 'approved_count', 'last_updated']
 
