@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
+from django.db import connection
 import logging
 
 from students.models import Submission
@@ -116,8 +117,8 @@ def custom_login(request):
                 logger.info(f"管理员登录尝试: {username}")
                 # 执行登录
                 login(request, user)
-                # 直接重定向到admin页面，使用绝对路径
-                return redirect('/admin/')
+                # 重定向到系统首页而不是Django管理后台
+                return redirect('/')
             
             # 对于非管理员用户，我们可以稍后再优化，但现在先确保管理员能登录
             # 暂时简化非管理员登录逻辑
@@ -405,25 +406,25 @@ class SubmissionViewSet(viewsets.ModelViewSet):
         return render(request, 'students/submission_detail.html', context)
 
 
-@api_view(['POST'])
-@permission_classes([permissions.IsAuthenticated])
+@login_required
 def submission_revoke(request, pk):
     submission = get_object_or_404(Submission, pk=pk)
     
     # 权限检查
     if not request.user.is_staff and submission.student.user != request.user:
-        return Response({'error': '只能撤回自己的提交'}, status=status.HTTP_403_FORBIDDEN)
+        return HttpResponse('只能撤回自己的提交', status=403)
     
     if submission.status != 'pending':
-        return Response({'error': '只能撤回待审核的提交'}, status=status.HTTP_400_BAD_REQUEST)
+        return HttpResponse('只能撤回待审核的提交', status=400)
     
     submission.status = 'revoked'
     submission.save()
     
-    # 重定向或返回JSON
-    if request.accepted_renderer.format == 'html' or request.headers.get('Accept') == 'text/html':
-        return HttpResponseRedirect(reverse('submission-list'))
-    return Response({'status': '提交已撤回'})
+    # 添加成功消息
+    messages.success(request, '提交已成功撤回')
+    
+    # 重定向到提交历史页面
+    return HttpResponseRedirect(reverse('students:submission-history'))
 
 
 @api_view(['POST'])
@@ -502,8 +503,7 @@ def submission_detail(request, pk):
         return render(request, 'students/submission_detail.html', context)
 
 
-@api_view(['GET', 'POST'])
-@permission_classes([permissions.IsAuthenticated])
+@login_required
 def upload_proof(request):
     """学生上传证明材料的视图"""
     if request.method == 'POST':
@@ -613,7 +613,7 @@ def upload_proof(request):
         messages.success(request, '证明材料上传成功，请等待审核')
         
         # 重定向到提交记录列表
-        return redirect('submission-list')
+        return redirect('students:submission-history')
     
     # GET请求，渲染上传表单
     # 获取所有可用的加分项目
@@ -1015,7 +1015,7 @@ def edit_student_info(request, student_id):
             
             # 添加成功消息
             messages.success(request, '学生信息更新成功！已记录变更历史。')
-            return redirect('students:student-detail', student_id=student.id)
+            return redirect('students:student-detail', pk=student.id)
     else:
         errors = {}
     
@@ -1111,12 +1111,17 @@ class ScoreItemViewSet(viewsets.ModelViewSet):
         if self.action == 'list':
             return [permissions.AllowAny()]
         # 其他操作需要管理员权限
-        elif self.action in ['create', 'update', 'partial_update', 'destroy']:
+        elif self.action in ['create', 'update', 'partial_update', 'destroy', 'post']:
             return [permissions.IsAdminUser()]
         # 详情视图允许所有用户访问
         elif self.action == 'retrieve':
             return [permissions.AllowAny()]
         return [permissions.IsAuthenticated()]
+    
+    def post(self, request, *args, **kwargs):
+        # 处理POST请求，将其重定向到retrieve方法
+        # 这解决了编辑scoreitem后出现的405 Method Not Allowed错误
+        return self.retrieve(request, *args, **kwargs)
     
     def retrieve(self, request, *args, **kwargs):
         # 获取对象实例

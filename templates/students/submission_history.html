@@ -100,7 +100,7 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">提交记录历史</h5>
                         <div>
-                            <a href="{% url 'upload-proof' %}" class="btn btn-primary btn-sm">上传新证明材料</a>
+                            <a href="{% url 'students:upload-proof' %}" class="btn btn-primary btn-sm">上传新证明材料</a>
                         </div>
                     </div>
                     {% else %}
@@ -191,7 +191,7 @@
             <div class="card-body text-center">
                 <h5>请先登录</h5>
                 <p class="text-muted mt-2">登录后查看提交记录</p>
-                <a href="{% url 'login' %}" class="btn btn-primary mt-3">前往登录</a>
+                <a href="{% url 'students:login' %}" class="btn btn-primary mt-3">前往登录</a>
             </div>
         </div>
         {% endif %}

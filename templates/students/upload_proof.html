@@ -55,7 +55,7 @@
                             </div>
                         {% endif %}
 
-                        <form method="post" enctype="multipart/form-data">
+                        <form method="post" enctype="multipart/form-data" action="{% url 'students:upload-proof' %}">
                             {% csrf_token %}
                             
                             <div class="form-group">

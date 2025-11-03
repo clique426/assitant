@@ -91,8 +91,14 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="major" class="form-label">专业</label>
-                            <input type="text" id="major" name="major" class="form-control" 
-                                   value="{{ student.major }}" placeholder="请输入专业名称">
+                            <select id="major" name="major" class="form-control">
+                                <option value="" {% if not student.major %}selected{% endif %}>请选择专业</option>
+                                <option value="计算机科学与技术" {% if student.major == '计算机科学与技术' %}selected{% endif %}>计算机科学与技术</option>
+                                <option value="人工智能" {% if student.major == '人工智能' %}selected{% endif %}>人工智能</option>
+                                <option value="软件工程" {% if student.major == '软件工程' %}selected{% endif %}>软件工程</option>
+                                <option value="网络安全" {% if student.major == '网络安全' %}selected{% endif %}>网络安全</option>
+                                <option value="通信工程" {% if student.major == '通信工程' %}selected{% endif %}>通信工程</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -172,27 +178,8 @@
             }, 1000);
         }
         
-        // 继续原有功能
-        // 添加表单提交前的确认机制
-        // 添加表单提交前的确认机制
+        // 获取表单元素
         const form = document.getElementById('edit-form');
-        
-        form.addEventListener('submit', function(e) {
-            // 获取表单数据用于确认信息
-            const fullName = document.getElementById('full_name').value;
-            const studentId = document.getElementById('student_id').value;
-            
-            // 显示确认对话框
-            const confirmMessage = `确定要保存以下信息吗？\n\n` +
-                                  `姓名: ${fullName}\n` +
-                                  `学号: ${studentId}\n\n` +
-                                  `点击"确定"将保存修改。`;
-            
-            if (!confirm(confirmMessage)) {
-                e.preventDefault();
-                console.log('用户取消了保存操作');
-            }
-        });
         
         // 添加输入验证的实时反馈
         const fieldValidators = {
@@ -329,55 +316,10 @@
                 }
             } else {
                 // 表单验证通过，显示确认对话框
-                e.preventDefault();
-                
-                // 使用Bootstrap的模态框作为确认对话框
-                const confirmModal = document.createElement('div');
-                confirmModal.className = 'modal fade show';
-                confirmModal.tabIndex = '-1';
-                confirmModal.setAttribute('style', 'display: block; background-color: rgba(0, 0, 0, 0.5);');
-                confirmModal.innerHTML = `
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header bg-warning text-dark">
-                                <h5 class="modal-title">确认更新</h5>
-                                <button type="button" class="btn-close" id="cancel-update"></button>
-                            </div>
-                            <div class="modal-body">
-                                <p>您确定要保存对学生信息的修改吗？</p>
-                                <p class="text-sm text-muted">修改后的数据将被记录并可能影响相关记录。</p>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" id="confirm-cancel">取消</button>
-                                <button type="button" class="btn btn-primary" id="confirm-save">确认保存</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                document.body.appendChild(confirmModal);
-                
-                // 添加点击事件监听器
-                document.getElementById('cancel-update').addEventListener('click', function() {
-                    document.body.removeChild(confirmModal);
-                });
-                
-                document.getElementById('confirm-cancel').addEventListener('click', function() {
-                    document.body.removeChild(confirmModal);
-                });
-                
-                document.getElementById('confirm-save').addEventListener('click', function() {
-                    // 确认保存，移除模态框并提交表单
-                    document.body.removeChild(confirmModal);
-                    form.submit();
-                });
-                
-                // 点击模态框外部关闭
-                confirmModal.addEventListener('click', function(event) {
-                    if (event.target === confirmModal) {
-                        document.body.removeChild(confirmModal);
-                    }
-                });
+                if (!confirm('您确定要保存对学生信息的修改吗？修改后将被记录并可能影响其他记录。')) {
+                    e.preventDefault();
+                    console.log('用户取消了提交');
+                }
             }
         });
     });

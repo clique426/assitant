@@ -167,6 +167,6 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # 登录URL配置
-LOGIN_URL = '/student/login/'
+LOGIN_URL = '/students/login/'
 LOGIN_REDIRECT_URL = '/'  # 登录成功后重定向到首页
 LOGOUT_REDIRECT_URL = '/'  # 登出成功后重定向到首页

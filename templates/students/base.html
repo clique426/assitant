@@ -450,14 +450,14 @@
             <nav class="navbar navbar-expand-lg navbar-dark">
                 <div class="container-fluid">
                     <!-- 左上角导航标题 -->
-                    <a class="navbar-brand" href="{% url 'home' %}">保研加分小助手</a>
+                    <a class="navbar-brand" href="{% url 'students:home' %}">保研加分小助手</a>
                     
                     <!-- 导航菜单 -->
                     <div class="collapse navbar-collapse justify-content-end">
                         <ul class="navbar-nav">
                             <!-- 已登录用户菜单 - 保留首页链接 -->
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'home' %}">首页</a>
+                                <a class="nav-link" href="{% url 'students:home' %}">首页</a>
                             </li>
                             {% if user.teacherprofile or user.is_superuser %}<!-- 教师和管理员账号 -->
                             <!-- 管理中心按钮 - 教师和管理员账号可见 -->
@@ -480,10 +480,10 @@
                             {% else %}<!-- 学生账号 -->
                             <!-- 学生账号导航链接 -->
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'personal-info' %}">个人信息</a>
+                                <a class="nav-link" href="{% url 'students:personal-info' %}">个人信息</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'submission-history' %}">提交记录</a>
+                                <a class="nav-link" href="{% url 'students:submission-history' %}">提交记录</a>
                             </li>
                             <!-- 学生账号显示欢迎字段 -->
                             <li class="nav-item">
@@ -491,7 +491,7 @@
                             </li>
                             {% endif %}
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'logout' %}">退出登录</a>
+                                <a class="nav-link" href="{% url 'students:logout' %}">退出登录</a>
                             </li>
                         </ul>
                     </div>
@@ -530,7 +530,7 @@
                 </div>
                 <!-- 合并的登录/注册按钮容器 - 居中显示 -->
                 <div class="pt-4 pb-2 text-center">
-                    <a href="{% url 'login' %}" class="btn btn-teal py-4 px-8 text-xl font-semibold rounded-xl shadow-lg bg-gradient-to-r from-teal-500 to-teal-600 text-white hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <a href="{% url 'students:login' %}" class="btn btn-teal py-4 px-8 text-xl font-semibold rounded-xl shadow-lg bg-gradient-to-r from-teal-500 to-teal-600 text-white hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
                         <i class="fa fa-user-circle mr-2 animated-icon"></i> 登录 / 注册
                     </a>
                 </div>

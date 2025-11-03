@@ -185,8 +185,14 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="major" class="form-label">专业</label>
-                                <input type="text" id="major" name="major" class="form-control" 
-                                       value="{{ student_profile.major|default:'' }}" placeholder="请输入专业名称">
+                                <select id="major" name="major" class="form-control">
+                                    <option value="" {% if not student_profile.major %}selected{% endif %}>请选择专业</option>
+                                    <option value="计算机科学与技术" {% if student_profile.major == '计算机科学与技术' %}selected{% endif %}>计算机科学与技术</option>
+                                    <option value="人工智能" {% if student_profile.major == '人工智能' %}selected{% endif %}>人工智能</option>
+                                    <option value="软件工程" {% if student_profile.major == '软件工程' %}selected{% endif %}>软件工程</option>
+                                    <option value="网络安全" {% if student_profile.major == '网络安全' %}selected{% endif %}>网络安全</option>
+                                    <option value="通信工程" {% if student_profile.major == '通信工程' %}selected{% endif %}>通信工程</option>
+                                </select>
                             </div>
                         </div>
                         <div class="col-md-6">

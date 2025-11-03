@@ -106,8 +106,8 @@
                     </div>
                     <div class="card-body">
                         {% if not is_teacher %}
-                        <a href="{% url 'upload-proof' %}" class="btn btn-primary btn-feature">上传证明材料</a>
-                        <a href="{% url 'submission-history' %}" class="btn btn-success btn-feature">查看提交记录</a>
+                        <a href="{% url 'students:upload-proof' %}" class="btn btn-primary btn-feature">上传证明材料</a>
+                        <a href="{% url 'students:submission-history' %}" class="btn btn-success btn-feature">查看提交记录</a>
                         {% endif %}
                         {% if user.is_staff or is_teacher %}
                         <a href="{% url 'students:studentprofile-list' %}" class="btn btn-secondary btn-feature">学生信息管理</a>
