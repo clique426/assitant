@@ -5,7 +5,7 @@ from rest_framework.reverse import reverse
 from rest_framework.views import APIView
 from django.utils import timezone
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group
@@ -1215,23 +1215,61 @@ class ScoreItemViewSet(viewsets.ModelViewSet):
                 return render(request, 'students/score_item_detail.html', context)
     
     def create(self, request, *args, **kwargs):
-        # 处理HTML表单提交
-        if request.method == 'POST' and not request.accepted_renderer.format == 'json':
+        # 处理HTML表单提交和Ajax请求
+        print(f"ScoreItemViewSet.create() 被调用，方法: {request.method}")
+        print(f"请求头: {dict(request.headers)}")
+        print(f"请求数据: {dict(request.POST)}")
+        
+        if request.method == 'POST':
             # 从表单获取数据
-            name = request.POST.get('name')
-            category = request.POST.get('category')
-            level = request.POST.get('level')
-            score = request.POST.get('score')
-            description = request.POST.get('description', '')
+            name = request.POST.get('name', '').strip()
+            category = request.POST.get('category', '').strip()
+            level = request.POST.get('level', '').strip()
+            score = request.POST.get('score', '').strip()
+            description = request.POST.get('description', '').strip()
+            
+            print(f"接收到添加项目请求: name={name}, category={category}, level={level}, score={score}")
             
             # 基本验证
             if not all([name, category, level, score]):
-                messages.error(request, '请填写所有必填字段')
+                error_msg = '请填写所有必填字段'
+                print(f"验证失败: {error_msg}")
+                
+                # 检查是否是Ajax请求
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({'error': error_msg}, status=400)
+                
+                messages.error(request, error_msg)
                 return redirect('students:scoreitem-list')
             
             # 尝试创建加分项目
             try:
                 score_value = float(score)
+                
+                # 检查项目是否已存在
+                existing_item = ScoreItem.objects.filter(name=name, category=category).first()
+                if existing_item:
+                    error_msg = f'加分项目 "{name}" 已存在'
+                    print(f"创建失败: {error_msg}")
+                    
+                    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                        return JsonResponse({'error': error_msg}, status=400)
+                    
+                    messages.error(request, error_msg)
+                    return redirect('students:scoreitem-list')
+                
+                # 确保类别值有效
+                valid_categories = [choice[0] for choice in ScoreItem.CATEGORY_CHOICES]
+                if category not in valid_categories:
+                    error_msg = f'无效的类别值: {category}'
+                    print(f"验证失败: {error_msg}")
+                    
+                    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                        return JsonResponse({'error': error_msg}, status=400)
+                    
+                    messages.error(request, error_msg)
+                    return redirect('students:scoreitem-list')
+                
                 score_item = ScoreItem.objects.create(
                     name=name,
                     category=category,
@@ -1239,16 +1277,42 @@ class ScoreItemViewSet(viewsets.ModelViewSet):
                     score=score_value,
                     description=description
                 )
-                messages.success(request, f'加分项目 "{score_item.name}" 创建成功')
+                
+                success_msg = f'加分项目 "{score_item.name}" 创建成功'
+                print(f"创建成功: {success_msg}")
+                
+                # 检查是否是Ajax请求
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({'success': True, 'message': success_msg, 'id': score_item.id}, status=201)
+                
+                messages.success(request, success_msg)
+                # 重定向回加分项目列表页面，附加success参数以触发前端刷新
+                return redirect('students:scoreitem-list' + '?success=true')
             except ValueError:
-                messages.error(request, '分值必须是有效的数字')
+                error_msg = '分值必须是有效的数字'
+                print(f"验证失败: {error_msg}")
+                
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({'error': error_msg}, status=400)
+                
+                messages.error(request, error_msg)
             except Exception as e:
-                messages.error(request, f'创建加分项目失败: {str(e)}')
+                error_msg = f'创建加分项目失败: {str(e)}'
+                print(f"创建失败: {error_msg}, 异常类型: {type(e).__name__}")
+                
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({'error': error_msg}, status=500)
+                
+                messages.error(request, error_msg)
             
-            # 重定向回加分项目列表页面
-            return redirect('students:scoreitem-list')
+            # 非Ajax请求失败时重定向
+            if not request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return redirect('students:scoreitem-list')
+            
+            # 默认返回错误（不应该到达这里）
+            return JsonResponse({'error': '未知错误'}, status=500)
         
-        # 对于API请求，使用默认的create方法
+        # 对于非POST请求，使用默认的create方法
         return super().create(request, *args, **kwargs)
     
     def list(self, request, *args, **kwargs):
