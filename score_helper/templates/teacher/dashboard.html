@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2>审批加分申请</h2>
+    <a href="{% url 'teacher_dashboard' %}" class="btn btn-secondary mb-3">返回审批中心</a>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4>申请详情</h4>
+        </div>
+        <div class="card-body">
+            <table class="table">
+                <tr>
+                    <th style="width: 200px;">申请人</th>
+                    <td>{{ application.student.username }}（学号：{{ application.student.student_id }}）</td>
+                </tr>
+                <tr>
+                    <th>加分类型</th>
+                    <td>{{ application.get_type_display }}</td>
+                </tr>
+                <tr>
+                    <th>项目详情</th>
+                    <td>{{ application.detail }}</td>
+                </tr>
+                <tr>
+                    <th>自评分数</th>
+                    <td>{{ application.self_score }}</td>
+                </tr>
+                <tr>
+                    <th>证明文件</th>
+                    <td>
+                        {% if application.proof_file %}
+                            <a href="{{ application.proof_file.url }}" target="_blank">查看文件</a>
+                        {% else %}
+                            无
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>提交时间</th>
+                    <td>{{ application.created_time|date:"Y-m-d H:i" }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h4>处理审批</h4>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+
+                <!-- 审批操作 -->
+                <div class="mb-3">
+                    <label class="form-label">操作类型</label>
+                    <div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="action" id="approve" value="approve" checked>
+                            <label class="form-check-label" for="approve">通过</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="action" id="reject" value="reject">
+                            <label class="form-check-label" for="reject">驳回</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 审批分数（通过时必填） -->
+                <div class="mb-3" id="approved_score_group">
+                    <label for="approved_score" class="form-label">审批分数</label>
+                    <input type="number" step="0.1" min="0" class="form-control" id="approved_score" name="approved_score"
+                           placeholder="请输入最终加分值" value="{{ application.self_score }}">
+                </div>
+
+                <!-- 驳回理由（驳回时必填） -->
+                <div class="mb-3" id="reject_reason_group" style="display: none;">
+                    <label for="reject_reason" class="form-label">驳回理由</label>
+                    <textarea class="form-control" id="reject_reason" name="reject_reason" rows="3" placeholder="请说明驳回原因"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">提交处理结果</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 切换操作类型时显示/隐藏对应字段 -->
+<script>
+    // 获取单选按钮
+    const approveRadio = document.getElementById('approve');
+    const rejectRadio = document.getElementById('reject');
+    // 获取对应输入框组
+    const scoreGroup = document.getElementById('approved_score_group');
+    const reasonGroup = document.getElementById('reject_reason_group');
+
+    // 监听单选按钮变化
+    approveRadio.addEventListener('change', function() {
+        if (this.checked) {
+            scoreGroup.style.display = 'block';
+            reasonGroup.style.display = 'none';
+        }
+    });
+
+    rejectRadio.addEventListener('change', function() {
+        if (this.checked) {
+            scoreGroup.style.display = 'none';
+            reasonGroup.style.display = 'block';
+        }
+    });
+</script>
+{% endblock %}

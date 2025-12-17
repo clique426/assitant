@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>我的加分项列表 - 厦门大学保研助手</title>
+    <style>
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #f2f2f2; }
+        .total-box { padding: 15px; background: #f8f9fa; border-radius: 4px; margin: 20px 0; }
+        .btn { padding: 8px 15px; background: #3498db; color: white; border: none; border-radius: 4px; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <h1>我的保研加分项列表</h1>
+    <div class="total-box">
+        <h3>当前加分汇总（对照厦大规则）</h3>
+        <p>学术专长总分：{{ final_academic }} 分（满分15分）</p>
+        <p>综合表现总分：{{ final_performance }} 分（满分5分）</p>
+        <p><a href="{% url 'calculate_total' %}" class="btn">点击计算推免综合成绩</a></p>
+    </div>
+
+    <h3>1. 学术专长加分项</h3>
+    {% if academic_scores %}
+        <table>
+            <tr>
+                <th>加分类型</th>
+                <th>具体信息</th>
+                <th>单项得分</th>
+                <th>备注</th>
+            </tr>
+            {% for score in academic_scores %}
+                <tr>
+                    <td>{{ score.get_score_type_display }}</td>
+                    <td>
+                        {% if score.score_type == 'competition' %}
+                            {{ score.get_competition_level_display }}-{{ score.get_competition_rank_display }}（{% if score.is_group %}团体{{ score.group_role }}{% else %}个人{% endif %}）
+                        {% elif score.score_type == 'paper' %}
+                            {{ score.get_paper_level_display }}期刊-{{ score.get_paper_author_display }}
+                        {% else %}
+                            {{ score.score_type }}
+                        {% endif %}
+                    </td>
+                    <td>{{ score.calculate_score|floatformat:2 }}</td>
+                    <td>{{ score.remark }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>暂无学术专长加分项，<a href="{% url 'add_score' %}">点击添加</a></p>
+    {% endif %}
+
+    <h3>2. 综合表现加分项</h3>
+    {% if performance_scores %}
+        <table>
+            <tr>
+                <th>加分类型</th>
+                <th>具体信息</th>
+                <th>单项得分</th>
+                <th>备注</th>
+            </tr>
+            {% for score in performance_scores %}
+                <tr>
+                    <td>{{ score.get_score_type_display }}</td>
+                    <td>
+                        {% if score.score_type == 'volunteer' %}
+                            {{ score.volunteer_hours }}小时（{% if score.is_large_event %}大型赛会/支教{% endif %}）
+                        {% elif score.score_type == 'cadre' %}
+                            {{ score.get_cadre_role_display }}（辅导员打分：{{ score.cadre_score }}）
+                        {% elif score.score_type == 'honor' %}
+                            {{ score.get_honor_level_display }}荣誉称号
+                        {% endif %}
+                    </td>
+                    <td>{{ score.calculate_score|floatformat:2 }}</td>
+                    <td>{{ score.remark }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>暂无综合表现加分项，<a href="{% url 'add_score' %}">点击添加</a></p>
+    {% endif %}
+
+    <hr>
+    <p><a href="{% url 'add_score' %}" class="btn">添加新加分项</a> | <a href="{% url 'index' %}" class="btn">返回首页</a></p>
+</body>
+</html>

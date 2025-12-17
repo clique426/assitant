@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>添加保研加分项 - 厦门大学保研助手</title>
+    <style>
+        .form-group { margin: 15px 0; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-control { width: 500px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        .submit-btn { padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>添加保研加分项</h1>
+    <hr>
+
+    <!-- 学术专长加分表单 -->
+    <h3>1. 学术专长加分（满分15分）</h3>
+    <form method="POST">
+        {% csrf_token %}
+        {{ academic_form.as_p }}  <!-- 自动生成表单字段 -->
+        <button type="submit" name="academic_submit" class="submit-btn">保存学术专长加分</button>
+    </form>
+
+    <hr>
+
+    <!-- 综合表现加分表单 -->
+    <h3>2. 综合表现加分（满分5分）</h3>
+    <form method="POST">
+        {% csrf_token %}
+        {{ performance_form.as_p }}
+        <button type="submit" name="performance_submit" class="submit-btn">保存综合表现加分</button>
+    </form>
+
+    <hr>
+    <p><a href="{% url 'score_list' %}">查看已添加的加分项</a> | <a href="{% url 'calculate_total' %}">计算推免综合成绩</a> | <a href="{% url 'index' %}">返回首页</a></p>
+
+    <!-- JS控制：选择加分类型后，显示对应字段 -->
+    <script>
+        // 学术专长表单字段控制
+        function showRelevantFields() {
+            const type = document.querySelector('select[name="score_type"]').value;
+            // 隐藏所有字段
+            document.querySelector('select[name="competition_level"]').parentNode.style.display = 'none';
+            document.querySelector('select[name="competition_rank"]').parentNode.style.display = 'none';
+            document.querySelector('input[name="is_group"]').parentNode.style.display = 'none';
+            document.querySelector('select[name="group_role"]').parentNode.style.display = 'none';
+            document.querySelector('select[name="paper_level"]').parentNode.style.display = 'none';
+            document.querySelector('select[name="paper_author"]').parentNode.style.display = 'none';
+            // 显示对应字段
+            if (type === 'competition') {
+                document.querySelector('select[name="competition_level"]').parentNode.style.display = 'block';
+                document.querySelector('select[name="competition_rank"]').parentNode.style.display = 'block';
+                document.querySelector('input[name="is_group"]').parentNode.style.display = 'block';
+                document.querySelector('select[name="group_role"]').parentNode.style.display = 'block';
+            } else if (type === 'paper') {
+                document.querySelector('select[name="paper_level"]').parentNode.style.display = 'block';
+                document.querySelector('select[name="paper_author"]').parentNode.style.display = 'block';
+            }
+        }
+
+        // 综合表现表单字段控制（类似逻辑）
+        function showPerfFields() {
+            const type = document.querySelector('select[name="score_type"]').value;
+            document.querySelector('input[name="volunteer_hours"]').parentNode.style.display = 'none';
+            document.querySelector('input[name="is_large_event"]').parentNode.style.display = 'none';
+            document.querySelector('select[name="cadre_role"]').parentNode.style.display = 'none';
+            document.querySelector('input[name="cadre_score"]').parentNode.style.display = 'none';
+            document.querySelector('select[name="honor_level"]').parentNode.style.display = 'none';
+            if (type === 'volunteer') {
+                document.querySelector('input[name="volunteer_hours"]').parentNode.style.display = 'block';
+                document.querySelector('input[name="is_large_event"]').parentNode.style.display = 'block';
+            } else if (type === 'cadre') {
+                document.querySelector('select[name="cadre_role"]').parentNode.style.display = 'block';
+                document.querySelector('input[name="cadre_score"]').parentNode.style.display = 'block';
+            } else if (type === 'honor') {
+                document.querySelector('select[name="honor_level"]').parentNode.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

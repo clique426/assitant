@@ -1,0 +1,127 @@
+{% load static %}  <!-- 必须加载static标签，解决"无法解析文件"问题 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>厦大保研加分小助手 - 登录</title>
+    <!-- 修正CDN链接：jedelivr → jsdelivr -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-image: url("{% static 'images/xmu_background.png' %}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        .login-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 40px 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            margin: 120px auto;
+        }
+        .login-title {
+            text-align: center;
+            font-size: 28px;
+            color: #0066cc;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+        .form-control {
+            border-radius: 8px;
+            padding: 12px 15px;
+            font-size: 16px;
+        }
+        .captcha-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .captcha-group img {
+            cursor: pointer;
+            border-radius: 8px;
+        }
+        .login-btn {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 18px;
+            font-weight: 500;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .login-btn:hover {
+            background-color: #0052a3;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2 class="login-title">厦大保研加分小助手</h2>
+        <form method="post">
+            {% csrf_token %}
+
+            <!-- 用户名输入框 -->
+            <div class="mb-3">
+                <label for="{{ form.username.id_for_label }}" class="form-label">用户名</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                    <div class="text-danger mt-1">{{ form.username.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <!-- 密码输入框 -->
+            <div class="mb-3">
+                <label for="{{ form.password.id_for_label }}" class="form-label">密码</label>
+                {{ form.password }}
+                {% if form.password.errors %}
+                    <div class="text-danger mt-1">{{ form.password.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <!-- 验证码部分 -->
+            <div class="mb-3 captcha-group">
+                <div style="flex: 1;">
+                    <label for="{{ form.captcha.id_for_label }}" class="form-label">验证码</label>
+                    {{ form.captcha }}
+                    {% if form.captcha.errors %}
+                        <div class="text-danger mt-1">{{ form.captcha.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                <!-- 验证码图片和刷新功能 -->
+                <img src="{{ form.captcha.image_url }}" alt="验证码" onclick="refreshCaptcha(this)">
+            </div>
+
+            <button type="submit" class="login-btn">登录</button>
+        </form>
+    </div>
+
+    <!-- JavaScript部分 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 验证码刷新函数
+        function refreshCaptcha(imgElement) {
+            var currentSrc = imgElement.src;
+            // 清除缓存，确保获取新的验证码
+            imgElement.src = currentSrc.split('?')[0] + '?refresh=' + new Date().getTime();
+        }
+
+        // 页面加载后初始化验证码
+        document.addEventListener('DOMContentLoaded', function() {
+            var captchaImg = document.querySelector('.captcha-group img');
+            if (captchaImg) {
+                // 确保初始加载验证码
+                refreshCaptcha(captchaImg);
+            }
+        });
+    </script>
+</body>
+</html>
