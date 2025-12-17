@@ -1,0 +1,199 @@
+{% extends 'students/base.html' %}
+
+{% block title %}提交记录历史 - 保研加分小助手{% endblock %}
+
+{% block content %}
+<style>
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    .filter-card {
+        background-color: #f1f3f5;
+        border: 1px solid #dee2e6;
+    }
+    .table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        color: #495057;
+    }
+    .table-hover tbody tr:hover {
+        background-color: #e9ecef;
+    }
+    .btn-action {
+        margin: 0 2px;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+    .pagination {
+        margin-top: 1rem;
+    }
+    .badge {
+        font-size: 0.875rem;
+        padding: 0.5em 0.75em;
+    }
+    .badge-pending { background-color: #ffc107; color: #212529; }
+    .badge-approved { background-color: #28a745; }
+    .badge-rejected { background-color: #dc3545; }
+    .badge-revoked { background-color: #6c757d; }
+</style>
+
+<div class="row">
+    <div class="col-md-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">首页</a></li>
+                <li class="breadcrumb-item active" aria-current="page">提交记录列表</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+        {% if user.is_authenticated %}
+        <div class="row">
+            <!-- 教师/管理员查看的筛选卡片 -->
+            {% if is_teacher %}
+            <div class="col-md-12">
+                <div class="card filter-card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">筛选条件</h5>
+                        <form method="get" class="row g-3">
+                            <div class="col-md-3">
+                                <label for="student_name" class="form-label">学生姓名</label>
+                                <input type="text" class="form-control" id="student_name" name="student_name" value="{{ request.GET.student_name|default:'' }}">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="student_id" class="form-label">学号</label>
+                                <input type="text" class="form-control" id="student_id" name="student_id" value="{{ request.GET.student_id|default:'' }}">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="assignment" class="form-label">作业/任务</label>
+                                <input type="text" class="form-control" id="assignment" name="assignment" value="{{ request.GET.assignment|default:'' }}">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="status" class="form-label">状态</label>
+                                <select class="form-select" id="status" name="status">
+                                    <option value="">全部状态</option>
+                                    <option value="pending">待审核</option>
+                                    <option value="approved">已通过</option>
+                                    <option value="rejected">已驳回</option>
+                                    <option value="revoked">已撤销</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">搜索</button>
+                                <a href="?" class="btn btn-outline-secondary ms-2">重置</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- 提交记录列表 -->
+            <div class="col-md-12">
+                <div class="card">
+                    {% if not is_teacher %}
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">提交记录历史</h5>
+                        <div>
+                            <a href="{% url 'students:upload-proof' %}" class="btn btn-primary btn-sm">上传新证明材料</a>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="card-title mb-0">提交记录列表</h5>
+                    </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>提交ID</th>
+                                        {% if is_teacher %}
+                                        <th>学生姓名</th>
+                                        <th>学号</th>
+                                        {% endif %}
+                                        <th>加分项目</th>
+                                        <th>分值</th>
+                                        <th>证明文件</th>
+                                        <th>状态</th>
+                                        <th>提交时间</th>
+                                        <th>审核时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if submissions %}
+                                    {% for submission in submissions %}
+                                    <tr>
+                                        <td>{{ submission.id }}</td>
+                                        {% if is_teacher %}
+                                        <td>{{ submission.student.full_name }}</td>
+                                        <td>{{ submission.student.student_id }}</td>
+                                        {% endif %}
+                                        <td>{{ submission.score_item.name }}</td>
+                                        <td>{{ submission.score_item.score }}</td>
+                                        <td>
+                                            {% if submission.proof_file %}
+                                            <a href="{{ submission.proof_file.url }}" target="_blank">查看文件</a>
+                                            {% else %}
+                                            <span class="text-muted">无</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if submission.status == 'pending' %}
+                                            <span class="badge badge-pending">待审核</span>
+                                            {% elif submission.status == 'approved' %}
+                                            <span class="badge badge-approved">已通过</span>
+                                            {% elif submission.status == 'rejected' %}
+                                            <span class="badge badge-rejected">已驳回</span>
+                                            {% elif submission.status == 'revoked' %}
+                                            <span class="badge badge-revoked">已撤销</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ submission.submitted_at|date:"Y-m-d H:i" }}</td>
+                                        <td>{{ submission.reviewed_at|date:"Y-m-d H:i"|default:"-" }}</td>
+                                        <td>
+                                            {% if not is_teacher and submission.status == 'pending' %}
+                                            <form method="post" action="{% url 'students:submission-revoke' submission.id %}" style="display: inline;">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-outline-danger btn-sm btn-action" onclick="return confirm('确定要撤回此提交吗？');">撤回</button>
+                                            </form>
+                                            {% endif %}
+                                            {% if submission.reviewer_comment %}
+                                            <button class="btn btn-outline-info btn-sm btn-action" data-toggle="modal" data-target="#commentModal{{ submission.id }}">查看说明</button>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="10" class="text-center text-muted">暂无提交记录</td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- 分页 -->
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="card">
+            <div class="card-body text-center">
+                <h5>请先登录</h5>
+                <p class="text-muted mt-2">登录后查看提交记录</p>
+                <a href="{% url 'students:login' %}" class="btn btn-primary mt-3">前往登录</a>
+            </div>
+        </div>
+        {% endif %}
+
+{% endblock %}

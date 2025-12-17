@@ -1,0 +1,138 @@
+{% extends 'students/base.html' %}
+
+{% block title %}提交记录详情{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3>提交记录详情</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>基本信息</h4>
+                    <dl class="row">
+                        <dt class="col-sm-4">提交ID:</dt>
+                        <dd class="col-sm-8">{{ submission.id }}</dd>
+                        <dt class="col-sm-4">提交时间:</dt>
+                        <dd class="col-sm-8">{{ submission.submitted_at }}</dd>
+                        <dt class="col-sm-4">状态:</dt>
+                        <dd class="col-sm-8">
+                            {% if submission.status == 'pending' %}
+                                <span class="badge badge-warning">待审核</span>
+                            {% elif submission.status == 'approved' %}
+                                <span class="badge badge-success">已通过</span>
+                            {% elif submission.status == 'rejected' %}
+                                <span class="badge badge-danger">已驳回</span>
+                            {% elif submission.status == 'revoked' %}
+                                <span class="badge badge-secondary">已撤回</span>
+                            {% else %}
+                                <span class="badge badge-info">{{ submission.status }}</span>
+                            {% endif %}
+                        </dd>
+                    </dl>
+                </div>
+                <div class="col-md-6">
+                    <h4>学生信息</h4>
+                    <dl class="row">
+                        <dt class="col-sm-4">姓名:</dt>
+                        <dd class="col-sm-8">{{ submission.student.full_name }}</dd>
+                        <dt class="col-sm-4">学号:</dt>
+                        <dd class="col-sm-8">{{ submission.student.student_id }}</dd>
+                        <dt class="col-sm-4">专业:</dt>
+                        <dd class="col-sm-8">{{ submission.student.major }}</dd>
+                    </dl>
+                </div>
+            </div>
+            
+            <hr>
+            
+            <h4>加分项目信息</h4>
+            <dl class="row">
+                <dt class="col-sm-3">项目名称:</dt>
+                <dd class="col-sm-9">{{ submission.score_item.name }}</dd>
+                <dt class="col-sm-3">加分值:</dt>
+                <dd class="col-sm-9">{{ submission.score_item.score }}</dd>
+                <dt class="col-sm-3">项目类别:</dt>
+                <dd class="col-sm-9">
+                    {% if submission.score_item.category == 'scholarship' %}
+                        奖学金
+                    {% elif submission.score_item.category == 'competition' %}
+                        竞赛
+                    {% elif submission.score_item.category == 'thesis' %}
+                        论文发表
+                    {% elif submission.score_item.category == 'patent' %}
+                        专利
+                    {% elif submission.score_item.category == 'other' %}
+                        其他
+                    {% else %}
+                        {{ submission.score_item.category }}
+                    {% endif %}
+                </dd>
+            </dl>
+            
+            <hr>
+            
+            <h4>证明材料</h4>
+            {% if submission.proof_file %}
+            <div class="row">
+                <dt class="col-sm-3">文件:</dt>
+                <dd class="col-sm-9">
+                    <a href="{{ submission.proof_file.url }}" target="_blank">
+                        {{ submission.proof_file.name }}
+                    </a>
+                </dd>
+            </div>
+            {% else %}
+            <p>无证明材料</p>
+            {% endif %}
+            
+            <hr>
+            
+            <h4>附加信息</h4>
+            <p>{{ submission.additional_info|default:"无" }}</p>
+            
+            <hr>
+            
+            {% if submission.reviewer_comment %}
+            <h4>审核意见</h4>
+            <p>{{ submission.reviewer_comment }}</p>
+            <hr>
+            {% endif %}
+            
+            {% if submission.status == 'reviewed' %}
+            <h4>审核信息</h4>
+            <dl class="row">
+                <dt class="col-sm-3">审核人:</dt>
+                <dd class="col-sm-9">{{ submission.reviewer }}</dd>
+                <dt class="col-sm-3">审核时间:</dt>
+                <dd class="col-sm-9">{{ submission.reviewed_at }}</dd>
+            </dl>
+            {% endif %}
+            
+            <div class="mt-4">
+                {% if user.is_staff and submission.status == 'pending' %}
+                <div class="d-inline-block mr-2">
+                    <form action="{% url 'students:submission-approve' submission.id %}" method="post" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success">通过</button>
+                    </form>
+                </div>
+                <div class="d-inline-block mr-2">
+                    <form action="{% url 'students:submission-reject' submission.id %}" method="post" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">驳回</button>
+                    </form>
+                </div>
+                {% elif submission.status == 'pending' and submission.student.user == user %}
+                <form action="{% url 'students:submission-revoke' submission.id %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-warning">撤回</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

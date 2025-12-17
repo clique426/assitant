@@ -1,0 +1,129 @@
+{% extends 'teachers/base.html' %}
+
+{% block title %}教师仪表盘 - 教师管理系统{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        {% if teacher %}
+        <h2>欢迎您，{{ teacher.full_name }}</h2>
+        <p class="text-muted">工号：{{ teacher.teacher_id }} | 部门：{{ teacher.department }}</p>
+        {% else %}
+        <h2>欢迎您，超级管理员</h2>
+        <p class="text-muted">账号：{{ user.username }} | 系统管理员</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">待审核</h5>
+                <p class="card-text display-4">{{ stats.pending_count }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">总提交</h5>
+                <p class="card-text display-4">{{ stats.total_submissions }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">已通过</h5>
+                <p class="card-text display-4">{{ stats.approved_count }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">已拒绝</h5>
+                <p class="card-text display-4">{{ stats.rejected_count }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>待审核提交</h5>
+            </div>
+            <div class="card-body">
+                {% if pending_submissions %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>学生</th>
+                            <th>项目</th>
+                            <th>提交时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for submission in pending_submissions %}
+                        <tr>
+                            <td>{{ submission.student.full_name }}</td>
+                            <td>{{ submission.score_item.name }}</td>
+                            <td>{{ submission.submitted_at|date:"Y-m-d H:i" }}</td>
+                            <td>
+                                <a href="{% url 'teachers:home' %}" class="btn btn-primary btn-sm">审核</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-center text-muted">暂无待审核提交</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>最近审核</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_reviews %}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>学生</th>
+                            <th>项目</th>
+                            <th>状态</th>
+                            <th>审核时间</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for submission in recent_reviews %}
+                        <tr>
+                            <td>{{ submission.student.full_name }}</td>
+                            <td>{{ submission.score_item.name }}</td>
+                            <td>
+                                {% if submission.status == 'approved' %}
+                                <span class="badge bg-success">通过</span>
+                                {% else %}
+                                <span class="badge bg-danger">拒绝</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ submission.reviewed_at|date:"Y-m-d H:i" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-center text-muted">暂无审核记录</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

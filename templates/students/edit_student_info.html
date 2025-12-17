@@ -1,0 +1,327 @@
+{% extends 'students/base.html' %}
+
+{% block title %}编辑学生信息 - 成绩管理系统{% endblock %}
+
+{% block content %}
+<style>
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    .form-label {
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    .form-control:focus {
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+    .alert {
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+    }
+    .btn-cancel {
+        margin-right: 0.5rem;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">编辑学生信息</h5>
+        </div>
+        <div class="card-body">
+            <!-- 显示成功消息 -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% elif message.tags == 'warning' %}alert-warning{% else %}alert-info{% endif %} alert-dismissible fade show" id="success-alert">
+                        {% if message.tags == 'success' %}<i class="fa fa-check-circle mr-2"></i>{% elif message.tags == 'error' %}<i class="fa fa-exclamation-circle mr-2"></i>{% elif message.tags == 'warning' %}<i class="fa fa-exclamation-triangle mr-2"></i>{% endif %}
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <!-- 显示错误消息 -->
+            {% if errors %}
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <i class="fa fa-exclamation-circle mr-2"></i>修改失败，请检查以下问题：
+                    <ul class="mt-2">
+                        {% for field, error in errors.items %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endif %}
+            
+            <!-- 编辑表单 -->
+            <form method="post" action="{% url 'students:edit-student-info' student.id %}" id="edit-form">
+                {% csrf_token %}
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="full_name" class="form-label">姓名 <span class="text-danger">*</span></label>
+                            <input type="text" id="full_name" name="full_name" class="form-control" 
+                                   value="{{ student.full_name }}" placeholder="请输入真实姓名" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="student_id" class="form-label">学号 <span class="text-danger">*</span></label>
+                            <input type="text" id="student_id" name="student_id" class="form-control" 
+                                   value="{{ student.student_id }}" placeholder="请输入学号" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="grade" class="form-label">年级</label>
+                            <input type="text" id="grade" name="grade" class="form-control" 
+                                   value="{{ student.grade }}" placeholder="如：2022级">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="major" class="form-label">专业</label>
+                            <select id="major" name="major" class="form-control">
+                                <option value="" {% if not student.major %}selected{% endif %}>请选择专业</option>
+                                <option value="计算机科学与技术" {% if student.major == '计算机科学与技术' %}selected{% endif %}>计算机科学与技术</option>
+                                <option value="人工智能" {% if student.major == '人工智能' %}selected{% endif %}>人工智能</option>
+                                <option value="软件工程" {% if student.major == '软件工程' %}selected{% endif %}>软件工程</option>
+                                <option value="网络安全" {% if student.major == '网络安全' %}selected{% endif %}>网络安全</option>
+                                <option value="通信工程" {% if student.major == '通信工程' %}selected{% endif %}>通信工程</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="class_name" class="form-label">班级</label>
+                            <input type="text" id="class_name" name="class_name" class="form-control" 
+                                   value="{{ student.class_name }}" placeholder="如：计算机1班">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="email" class="form-label">邮箱</label>
+                            <input type="email" id="email" name="email" class="form-control" 
+                                   value="{{ student.email }}" placeholder="请输入邮箱地址">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="phone" class="form-label">联系电话</label>
+                            <input type="tel" id="phone" name="phone" class="form-control" 
+                                   value="{{ student.phone }}" placeholder="请输入联系电话">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="alert alert-info">
+                            <i class="fa fa-info-circle mr-2"></i>
+                            编辑说明：
+                            <ul class="mt-1">
+                                <li>带 <span class="text-danger">*</span> 的字段为必填项</li>
+                                <li>学号修改时将进行唯一性检查</li>
+                                <li>邮箱修改将同步更新用户登录账号的邮箱</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">保存修改</button>
+                    <a href="{% url 'students:student-detail' student.id %}" class="btn btn-secondary btn-cancel">取消</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 页面加载完成后检查是否有成功消息，如果有则3秒后自动跳转回学生详情页
+    document.addEventListener('DOMContentLoaded', function() {
+        const successAlert = document.getElementById('success-alert');
+        if (successAlert && successAlert.classList.contains('alert-success')) {
+            // 显示一个倒计时提示
+            const countdownElement = document.createElement('span');
+            countdownElement.className = 'ml-2 text-sm font-medium';
+            successAlert.appendChild(countdownElement);
+            
+            let countdown = 3;
+            countdownElement.textContent = `将在 ${countdown} 秒后返回学生详情页`;
+            
+            const timer = setInterval(function() {
+                countdown--;
+                if (countdown > 0) {
+                    countdownElement.textContent = `将在 ${countdown} 秒后返回学生详情页`;
+                } else {
+                    clearInterval(timer);
+                    // 跳转到学生详情页
+                    window.location.href = "{% url 'students:student-detail' student.id %}";
+                }
+            }, 1000);
+        }
+        
+        // 获取表单元素
+        const form = document.getElementById('edit-form');
+        
+        // 添加输入验证的实时反馈
+        const fieldValidators = {
+            'full_name': {
+                validate: function(value) {
+                    if (value.trim() === '') return '姓名不能为空';
+                    if (value.length > 100) return '姓名不能超过100个字符';
+                    return '';
+                }
+            },
+            'student_id': {
+                validate: function(value) {
+                    if (value.trim() === '') return '学号不能为空';
+                    if (value.length > 20) return '学号不能超过20个字符';
+                    if (!/^[a-zA-Z0-9]+$/.test(value)) return '学号只能包含字母和数字';
+                    return '';
+                }
+            },
+            'email': {
+                validate: function(value) {
+                    if (!value) return '';
+                    if (value.length > 100) return '邮箱不能超过100个字符';
+                    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return '请输入有效的邮箱地址';
+                    return '';
+                }
+            },
+            'phone': {
+                validate: function(value) {
+                    if (!value) return '';
+                    if (!/^\d+$/.test(value)) return '电话号码只能包含数字';
+                    if (value.length !== 11) return '请输入有效的11位手机号码';
+                    return '';
+                }
+            },
+            'grade': {
+                validate: function(value) {
+                    if (!value) return '';
+                    if (value.length > 20) return '年级信息不能超过20个字符';
+                    return '';
+                }
+            },
+            'major': {
+                validate: function(value) {
+                    if (!value) return '';
+                    if (value.length > 50) return '专业信息不能超过50个字符';
+                    return '';
+                }
+            },
+            'class_name': {
+                validate: function(value) {
+                    if (!value) return '';
+                    if (value.length > 20) return '班级信息不能超过20个字符';
+                    return '';
+                }
+            }
+        };
+        
+        // 为每个字段添加验证事件
+        Object.keys(fieldValidators).forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                // 添加输入事件监听
+                field.addEventListener('input', function() {
+                    validateField(this);
+                });
+                
+                // 添加失去焦点事件监听
+                field.addEventListener('blur', function() {
+                    validateField(this);
+                });
+            }
+        });
+        
+        // 验证单个字段
+        function validateField(field) {
+            const fieldId = field.id;
+            const validator = fieldValidators[fieldId];
+            
+            if (validator) {
+                const errorMessage = validator.validate(field.value);
+                
+                // 移除之前的错误提示
+                let errorElement = field.parentNode.querySelector('.invalid-feedback');
+                if (errorElement) {
+                    field.parentNode.removeChild(errorElement);
+                }
+                
+                // 显示新的错误或移除错误状态
+                if (errorMessage) {
+                    field.classList.remove('is-valid');
+                    field.classList.add('is-invalid');
+                    
+                    // 创建错误提示元素
+                    errorElement = document.createElement('div');
+                    errorElement.className = 'invalid-feedback';
+                    errorElement.textContent = errorMessage;
+                    field.parentNode.appendChild(errorElement);
+                } else {
+                    field.classList.remove('is-invalid');
+                    field.classList.add('is-valid');
+                }
+            }
+        }
+        
+        // 表单提交前验证所有字段并显示确认对话框
+        form.addEventListener('submit', function(e) {
+            let isValid = true;
+            
+            Object.keys(fieldValidators).forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    validateField(field);
+                    if (field.classList.contains('is-invalid')) {
+                        isValid = false;
+                    }
+                    // 检查必填字段
+                    if (['full_name', 'student_id'].includes(fieldId) && field.value.trim() === '') {
+                        isValid = false;
+                    }
+                }
+            });
+            
+            if (!isValid) {
+                e.preventDefault();
+                console.log('表单验证失败，阻止提交');
+                
+                // 显示验证失败的提示
+                let errorAlert = document.querySelector('.validation-error-alert');
+                if (!errorAlert) {
+                    errorAlert = document.createElement('div');
+                    errorAlert.className = 'alert alert-danger alert-dismissible fade show validation-error-alert';
+                    errorAlert.innerHTML = '<i class="fa fa-exclamation-circle mr-2"></i>表单验证失败，请修正标记的字段后重试<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+                    form.parentNode.insertBefore(errorAlert, form);
+                }
+            } else {
+                // 表单验证通过，显示确认对话框
+                if (!confirm('您确定要保存对学生信息的修改吗？修改后将被记录并可能影响其他记录。')) {
+                    e.preventDefault();
+                    console.log('用户取消了提交');
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

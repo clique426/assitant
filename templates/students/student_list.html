@@ -1,0 +1,186 @@
+{% extends 'students/base.html' %}
+
+{% block title %}学生列表 - 保研加分小助手{% endblock %}
+
+{% block content %}
+<style>
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    .filter-card {
+        background-color: #f1f3f5;
+        border: 1px solid #dee2e6;
+    }
+    .table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        color: #495057;
+    }
+    .table-hover tbody tr:hover {
+        background-color: #e9ecef;
+    }
+    .btn-action {
+        margin: 0 2px;
+    }
+    .pagination {
+        margin-top: 1rem;
+    }
+    .badge {
+        font-size: 0.875rem;
+        padding: 0.5em 0.75em;
+    }
+</style>
+
+<div class="row">
+    <div class="col-md-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">首页</a></li>
+                <li class="breadcrumb-item active" aria-current="page">学生列表</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+        <div class="row">
+            <div class="col-md-12">
+        </div>
+
+        <div class="row">
+            <!-- 筛选卡片 -->
+            <div class="col-md-12">
+                <div class="card filter-card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">筛选条件</h5>
+                        <form method="get" class="row g-3">
+                            <div class="col-md-3">
+                                <label for="name" class="form-label">姓名</label>
+                                <input type="text" class="form-control" id="name" name="name" value="{{ request.GET.name }}">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="student_id" class="form-label">学号</label>
+                                <input type="text" class="form-control" id="student_id" name="student_id" value="{{ request.GET.student_id }}">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="class_name" class="form-label">班级</label>
+                                <select class="form-select" id="class_name" name="class_name">
+                                    <option value="">全部班级</option>
+                                    {% for class in class_list %}
+                                        <option value="{{ class }}" {% if request.GET.class_name == class %}selected{% endif %}>{{ class }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="major" class="form-label">专业</label>
+                                <select class="form-select" id="major" name="major">
+                                    <option value="">全部专业</option>
+                                    {% for major in major_list %}
+                                        <option value="{{ major }}" {% if request.GET.major == major %}selected{% endif %}>{{ major }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">搜索</button>
+                                <a href="?" class="btn btn-outline-secondary ms-2">重置</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 学生列表 -->
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="card-title mb-0">学生信息列表</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>学号</th>
+                                        <th>姓名</th>
+                                        <th>专业</th>
+                                        <th>班级</th>
+                                        <th>总分数</th>
+                                        <th>提交次数</th>
+                                        <th>通过次数</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    <!-- 遍历学生数据 -->
+                                    {% if students %}
+                                        {% for student in students %}
+                                            <tr>
+                                                <td>{{ student.student_id|default:"未知" }}</td>
+                                                <td>{{ student.full_name|default:"未知" }}</td>
+                                                <td>{{ student.major|default:"未知" }}</td>
+                                                <td>{{ student.class_name|default:"未知" }}</td>
+                                                <td>
+                                                    <span class="badge bg-primary">{{ student.total_score|default:0 }}</span>
+                                                </td>
+                                                <td>{{ student.submission_count|default:0 }}</td>
+                                                <td>{{ student.approved_count|default:0 }}</td>
+                                                <td>
+                                            <a href="{{ student.detail_url|default:'#' }}" class="btn btn-sm btn-primary btn-action" title="查看/编辑详情">查看/编辑</a>
+                                        </td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="8" class="text-center text-muted">暂无学生数据</td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- 分页 -->
+                        {% if is_paginated %}
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination justify-content-center">
+                                    {% if page_obj.has_previous %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                                                <span aria-hidden="true">&laquo;</span>
+                                            </a>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item disabled">
+                                            <span class="page-link" aria-hidden="true">&laquo;</span>
+                                        </li>
+                                    {% endif %}
+
+                                    {% for num in page_obj.paginator.page_range %}
+                                        {% if page_obj.number == num %}
+                                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                            <li class="page-item"><a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ num }}">{{ num }}</a></li>
+                                        {% endif %}
+                                    {% endfor %}
+
+                                    {% if page_obj.has_next %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}" aria-label="Next">
+                                                <span aria-hidden="true">&raquo;</span>
+                                            </a>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item disabled">
+                                            <span class="page-link" aria-hidden="true">&raquo;</span>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock %}

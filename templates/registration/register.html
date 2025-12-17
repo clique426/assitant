@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册 - 保研加分小助手</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,%3Csvg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z" fill="%23ffffff" fill-opacity="0.05" fill-rule="evenodd"/%3E%3C/svg%3E');
+            opacity: 0.5;
+        }
+        .register-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 500px;
+        }
+        .register-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        .register-card:hover {
+            transform: translateY(-5px);
+        }
+        .register-header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7e22ce 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        .register-header h2 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 1.8rem;
+        }
+        .register-body {
+            padding: 2rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #4b5563;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+            outline: none;
+        }
+        .input-icon {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .input-icon .fa {
+            position: absolute;
+            left: 1rem;
+            color: #9ca3af;
+            z-index: 1;
+        }
+        .input-icon input,
+        .input-icon select {
+            padding-left: 2.5rem;
+            width: 100%;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #4f46e5 0%, #7e22ce 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.3);
+        }
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        .text-center {
+            text-align: center;
+        }
+        .text-muted {
+            color: #6b7280;
+        }
+        .text-primary {
+            color: #4f46e5 !important;
+        }
+        .text-primary:hover {
+            color: #4338ca !important;
+        }
+        .mt-3 {
+            margin-top: 1rem;
+        }
+        .mb-3 {
+            margin-bottom: 1rem;
+        }
+        .alert {
+            border-radius: 8px;
+            border: none;
+            margin-bottom: 1.5rem;
+        }
+        .alert-danger {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+        .row {
+            display: flex;
+            gap: 1rem;
+        }
+        .col {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-card">
+            <!-- 注册头部 -->
+            <div class="register-header">
+                <i class="fa fa-user-plus fa-3x mb-3"></i>
+                <h2>学生注册</h2>
+                <p class="mt-2 opacity-80">创建您的账号，开始使用保研加分助手</p>
+            </div>
+            
+            <!-- 注册表单 -->
+            <div class="register-body">
+                <!-- 错误信息 -->
+                {% if errors %}
+                    <div class="alert alert-danger">
+                        <i class="fa fa-exclamation-circle"></i> 注册失败，请检查以下问题：
+                        <ul class="mt-2">
+                            {% for field, error in errors.items %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+                
+                <!-- 注册表单 -->
+                <form method="post" action="{% url 'students:register' %}">
+                    {% csrf_token %}
+                    
+                    <!-- 隐藏的用户类型字段，默认为学生 -->
+                    <input type="hidden" name="user_type" value="student">
+                    
+                    <div class="form-group">
+                        <label for="username" class="form-label">用户名</label>
+                        <div class="input-icon">
+                            <i class="fa fa-user"></i>
+                            <input type="text" id="username" name="username" class="form-control" placeholder="请设置用户名" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password" class="form-label">密码</label>
+                        <div class="input-icon">
+                            <i class="fa fa-lock"></i>
+                            <input type="password" id="password" name="password" class="form-control" placeholder="请设置密码（至少6位）" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirm_password" class="form-label">确认密码</label>
+                        <div class="input-icon">
+                            <i class="fa fa-lock"></i>
+                            <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="请再次输入密码" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="full_name" class="form-label">姓名</label>
+                        <div class="input-icon">
+                            <i class="fa fa-id-card"></i>
+                            <input type="text" id="full_name" name="full_name" class="form-control" placeholder="请输入真实姓名" required>
+                        </div>
+                    </div>
+                    
+                    <!-- 学生特有字段 -->
+                    <div class="student-fields">
+                        <div class="form-group">
+                            <label for="student_id" class="form-label">学号</label>
+                            <div class="input-icon">
+                                <i class="fa fa-graduation-cap"></i>
+                                <input type="text" id="student_id" name="student_id" class="form-control" placeholder="请输入学号" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="major" class="form-label">专业</label>
+                            <div class="input-icon">
+                                <i class="fa fa-book"></i>
+                                <select id="major" name="major" class="form-control" required>
+                                    <option value="" disabled selected>请选择专业</option>
+                                    <option value="计算机科学与技术">计算机科学与技术</option>
+                                    <option value="人工智能">人工智能</option>
+                                    <option value="软件工程">软件工程</option>
+                                    <option value="网络安全">网络安全</option>
+                                    <option value="通信工程">通信工程</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="grade" class="form-label">年级</label>
+                                    <div class="input-icon">
+                                        <i class="fa fa-calendar"></i>
+                                        <input type="text" id="grade" name="grade" class="form-control" placeholder="如：2022" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="class_name" class="form-label">班级</label>
+                                    <div class="input-icon">
+                                        <i class="fa fa-users"></i>
+                                        <input type="text" id="class_name" name="class_name" class="form-control" placeholder="如：计算机1班" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 老师特有字段已移除，系统当前仅支持学生注册 -->
+                    
+                    <!-- JavaScript代码已移除，因为系统当前仅支持学生注册 -->
+                    
+                    <div class="form-group">
+                        <label for="email" class="form-label">邮箱</label>
+                        <div class="input-icon">
+                            <i class="fa fa-envelope"></i>
+                            <input type="email" id="email" name="email" class="form-control" placeholder="请输入邮箱地址">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone" class="form-label">手机号</label>
+                        <div class="input-icon">
+                            <i class="fa fa-phone"></i>
+                            <input type="tel" id="phone" name="phone" class="form-control" placeholder="请输入手机号码">
+                        </div>
+                    </div>
+                    
+                    <!-- 注册按钮 -->
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa fa-user-plus"></i> 注册
+                    </button>
+                    
+                    <!-- 隐藏的下一页参数 -->
+                    <input type="hidden" name="next" value="{{ request.GET.next }}">
+                </form>
+                
+                <!-- 辅助链接 -->
+                <div class="mt-3 text-center text-muted">
+                    <p>已有账号？<a href="{% url 'students:login' %}" class="text-primary">立即登录</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

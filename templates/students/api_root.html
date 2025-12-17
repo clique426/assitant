@@ -1,0 +1,128 @@
+{% extends 'students/base.html' %}
+
+{% block title %}保研加分小助手 - 首页{% endblock %}
+
+{% block content %}
+<style>
+    .card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    .stat-card .card-body {
+        text-align: center;
+    }
+    .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #007bff;
+    }
+    .stat-label {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-top: 0.5rem;
+    }
+    .api-endpoint {
+        padding: 1rem;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+        background-color: #ffffff;
+    }
+    .api-endpoint a {
+        text-decoration: none;
+        color: #007bff;
+    }
+    .api-endpoint a:hover {
+        text-decoration: underline;
+    }
+    .timestamp {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+</style>
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">系统统计</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-number">{{ total_students }}</div>
+                                    <div class="stat-label">总学生数</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-number">{{ total_submissions }}</div>
+                                    <div class="stat-label">总提交数</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-number">{{ pending_submissions }}</div>
+                                    <div class="stat-label">待审核数</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-number">{{ total_score_items }}</div>
+                                    <div class="stat-label">加分项目数</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">系统信息</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            <li class="list-group-item">系统版本: {{ system_version }}</li>
+                            <li class="list-group-item">最后更新: {{ last_update }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">快速导航</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if not user.is_authenticated %}
+                        <div class="api-endpoint">
+                            <a href="{{ login_url }}">请先登录</a>
+                            <p class="text-sm text-muted mt-1">登录后查看个人信息</p>
+                        </div>
+                        {% endif %}
+                        {% if user.is_staff %}
+                        <div class="api-endpoint">
+                            <a href="{{ score_item_list_url }}">加分项目管理</a>
+                            <p class="text-sm text-muted mt-1">管理可加分的项目</p>
+                        </div>
+                        {% endif %}
+                        {% if user.is_authenticated %}
+                        <div class="api-endpoint bg-light">
+                            <a href="{% url 'students:upload-proof' %}" class="text-primary font-weight-bold">上传证明材料</a>
+                            <p class="text-sm text-muted mt-1">提交加分证明文件</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页面信息已移至base.html页脚 -->
+{% endblock %}

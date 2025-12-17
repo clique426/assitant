@@ -1,0 +1,26 @@
+/* students/static/students/css/style.css */
+body {
+    font-family: "Microsoft YaHei", sans-serif;
+    background-color: #f8f9fa;
+}
+
+.card {
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}
+
+.w-16 {
+    width: 4rem;
+}
+
+.h-16 {
+    height: 4rem;
+}
+
+.jumbotron {
+    border-left: 4px solid #0d6efd;
+}

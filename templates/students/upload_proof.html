@@ -1,0 +1,105 @@
+{% extends 'students/base.html' %}
+
+{% block title %}上传证明材料 - 保研加分小助手{% endblock %}
+
+{% block content %}
+<style>
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    .error-message {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    .success-message {
+        color: #28a745;
+        margin-bottom: 1rem;
+    }
+</style>
+
+<div class="row">
+    <div class="col-md-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'students:api-root' %}">首页</a></li>
+                <li class="breadcrumb-item active" aria-current="page">上传证明材料</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="card-title mb-0">上传证明材料</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- 成功消息 -->
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-success" role="alert">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <!-- 错误消息 -->
+                        {% if errors %}
+                            <div class="alert alert-danger" role="alert">
+                                <strong>提交失败，请检查以下问题：</strong>
+                                {% for field, error in errors.items %}
+                                    {{ error }}{% if not forloop.last %}、{% endif %}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <form method="post" enctype="multipart/form-data" action="{% url 'students:upload-proof' %}">
+                            {% csrf_token %}
+                            
+                            <div class="form-group">
+                                <label for="score_item" class="form-label">选择加分项目 <span class="text-danger">*</span></label>
+                                <select class="form-select {% if errors.score_item %}is-invalid{% endif %}" id="score_item" name="score_item">
+                                    <option value="">请选择加分项目</option>
+                                    {% if score_items %}
+                                        {% for item in score_items %}
+                                            <option value="{{ item.id }}">{{ item.name }} ({{ item.score }}分) - {{ item.get_category_display }}</option>
+                                        {% endfor %}
+                                    {% else %}
+                                        <!-- 默认选项，确保下拉框有内容 -->
+                                        <option value="1">校级一等奖学金 (3.0分) - 奖学金</option>
+                                        <option value="2">省级竞赛二等奖 (2.5分) - 竞赛</option>
+                                        <option value="3">发表论文 (2.0分) - 论文</option>
+                                        <option value="4">校级优秀学生 (1.5分) - 其他</option>
+                                        <option value="5">专利授权 (3.5分) - 专利</option>
+                                    {% endif %}
+                                </select>
+                                {% if errors.score_item %}
+                                    <div class="error-message">{{ errors.score_item }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group">
+                                <label for="proof_file" class="form-label">上传证明文件 <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control {% if errors.proof_file %}is-invalid{% endif %}" id="proof_file" name="proof_file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                                <div class="form-text">支持PDF、Word、图片等格式的文件</div>
+                                {% if errors.proof_file %}
+                                    <div class="error-message">{{ errors.proof_file }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group">
+                                <label for="additional_info" class="form-label">补充说明</label>
+                                <textarea class="form-control" id="additional_info" name="additional_info" rows="3" placeholder="请输入相关说明或备注信息（选填）"></textarea>
+                            </div>
+
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary">提交审核</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock %}

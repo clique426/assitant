@@ -1,0 +1,66 @@
+{% extends 'teachers/base.html' %}
+
+{% block title %}个人信息 - 教师管理系统{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header">
+                <h3>个人信息</h3>
+            </div>
+            <div class="card-body">
+                {% if teacher %}
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="full_name" class="form-label">真实姓名</label>
+                        <input type="text" class="form-control" id="full_name" value="{{ teacher.full_name }}" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="teacher_id" class="form-label">工号</label>
+                        <input type="text" class="form-control" id="teacher_id" value="{{ teacher.teacher_id }}" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="department" class="form-label">部门</label>
+                        <input type="text" class="form-control" id="department" value="{{ teacher.department }}" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">邮箱</label>
+                        <input type="email" class="form-control" id="email" value="{{ teacher.email }}" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">联系电话</label>
+                        <input type="text" class="form-control" id="phone" value="{{ teacher.phone }}" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="last_updated" class="form-label">最后更新时间</label>
+                        <input type="text" class="form-control" id="last_updated" value="{{ teacher.last_updated|date:'Y-m-d H:i:s' }}" readonly>
+                    </div>
+                </form>
+                {% else %}
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="username" class="form-label">用户名</label>
+                        <input type="text" class="form-control" id="username" value="{{ user.username }}" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">邮箱</label>
+                        <input type="email" class="form-control" id="email" value="{{ user.email }}" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="user_type" class="form-label">用户类型</label>
+                        <input type="text" class="form-control" id="user_type" value="超级管理员" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="date_joined" class="form-label">创建时间</label>
+                        <input type="text" class="form-control" id="date_joined" value="{{ user.date_joined|date:'Y-m-d H:i:s' }}" readonly>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
